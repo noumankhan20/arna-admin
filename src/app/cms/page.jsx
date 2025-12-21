@@ -1,5 +1,5 @@
-import CmsHeroImagesPage from "@/component/cms/CmsHeroImagesPage";
+import CMSAdminPanel from "@/component/cms/CMSAdminPanel";
 
 export default function Page() {
-  return <CmsHeroImagesPage />;
+  return <CMSAdminPanel />;
 }
