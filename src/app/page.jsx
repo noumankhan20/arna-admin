@@ -1,5 +1,11 @@
-import DashboardPage from "@/component/dashboard/DashboardPage";
-
-export default function Page() {
-  return <DashboardPage />;
+import React from 'react'
+import LoginPage from '@/component/auth/LoginPage'
+const page = () => {
+  return (
+    <div>
+      <LoginPage />
+      </div>
+  )
 }
+
+export default page
