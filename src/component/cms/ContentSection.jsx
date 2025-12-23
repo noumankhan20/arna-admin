@@ -1,12 +1,12 @@
 "use client";
-import { Save, Trash2, Image as ImageIcon } from "lucide-react";
+import { Save, Upload, Image as ImageIcon, Trash2 } from "lucide-react";
 
 export default function ContentSection({
   title,
   data,
   section,
   setCmsData,
-  onSave
+  onSave,
 }) {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -14,63 +14,71 @@ export default function ContentSection({
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setCmsData(prev => ({
+      setCmsData((prev) => ({
         ...prev,
         [section]: {
           ...prev[section],
           image: file,
-          imagePreview: reader.result
-        }
+          imagePreview: reader.result,
+        },
       }));
     };
     reader.readAsDataURL(file);
   };
 
   const handleInputChange = (field, value) => {
-    setCmsData(prev => ({
+    setCmsData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
-   return (
-    <div className="max-w-4xl">
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-        <div className="px-6 py-4 border-b border-gray-200">
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-gray-50 rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        {/* Header - Fixed gradient */}
+        <div className="bg-gradient-to-r from-emerald-500/10 via-emerald-400/5 to-transparent px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          <p className="text-sm text-gray-500 mt-1">Update the content for this section</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Edit the content for this section
+          </p>
         </div>
 
-        <div className="p-6 space-y-6">
-          {/* Image Upload */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+        {/* Body */}
+        <div className="p-6 space-y-5">
+          {/* Image block */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-900">
               Section Image
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-emerald-500 transition-colors">
-              {data.imagePreview ? (
-                <div className="relative">
-                  <img
-                    src={data.imagePreview}
-                    alt="Preview"
-                    className="w-full h-64 object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={() => handleInputChange('imagePreview', null)}
-                    className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-lg hover:bg-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+            <div className="space-y-3">
+              <div className="relative group">
+                <div className="w-full h-48 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden transition-all group-hover:border-emerald-500/50">
+                  {data.imagePreview ? (
+                    <img
+                      src={data.imagePreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <ImageIcon className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">
+                        No image selected
+                      </p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <label className="cursor-pointer flex flex-col items-center">
-                  <ImageIcon className="w-12 h-12 text-gray-400 mb-3" />
-                  <span className="text-sm font-medium text-gray-700 mb-1">
-                    Click to upload image
-                  </span>
-                  <span className="text-xs text-gray-500">PNG, JPG up to 5MB</span>
+
+                {/* Overlay upload button */}
+                <label className="absolute inset-0 flex items-center justify-center bg-white/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl cursor-pointer">
+                  <div className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg font-medium text-sm">
+                    <Upload className="w-4 h-4" />
+                    Upload Image
+                  </div>
                   <input
                     type="file"
                     accept="image/*"
@@ -78,48 +86,68 @@ export default function ContentSection({
                     className="hidden"
                   />
                 </label>
-              )}
+
+                {/* Remove image button */}
+                {data.imagePreview && (
+                  <button
+                    type="button"
+                    onClick={() => handleInputChange("imagePreview", null)}
+                    className="absolute top-3 right-3 bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* URL input */}
+              <input
+                type="text"
+                value={data.imageUrl || ""}
+                onChange={(e) => handleInputChange("imageUrl", e.target.value)}
+                placeholder="Or enter image URL"
+                className="w-full px-4 py-2.5 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              />
             </div>
           </div>
 
           {/* Title */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-900">
               Title
             </label>
             <input
               type="text"
               value={data.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
+              onChange={(e) => handleInputChange("title", e.target.value)}
               placeholder="Enter section title"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none text-gray-900"
+              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
             />
           </div>
 
           {/* Description */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-900">
               Description
             </label>
             <textarea
               value={data.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              onChange={(e) => handleInputChange("description", e.target.value)}
               placeholder="Enter section description"
-              rows={5}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none text-gray-900 resize-none"
+              rows={4}
+              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all resize-none"
             />
           </div>
+        </div>
 
-          {/* Save Button */}
-          <div className="flex justify-end pt-4 border-t border-gray-200">
-            <button
-              onClick={() => onSave(section)}
-              className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium text-sm"
-            >
-              <Save className="w-4 h-4" />
-              Save Changes
-            </button>
-          </div>
+        {/* Footer / Save */}
+        <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-200 flex justify-end">
+          <button
+            onClick={() => onSave(section)}
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:opacity-90 transition-all shadow-lg hover:shadow-emerald-500/25"
+          >
+            <Save className="w-4 h-4" />
+            Save Changes
+          </button>
         </div>
       </div>
     </div>
