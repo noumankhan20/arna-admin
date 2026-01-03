@@ -1,5 +1,11 @@
 "use client";
-import { Save, Upload, Image as ImageIcon, Trash2 } from "lucide-react";
+import { Save, Image as ImageIcon, Eye, Upload, X, CheckCircle2, AlertCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  useGetCmsSectionQuery,
+  useSaveCmsSectionMutation,
+  useUploadImageMutation,
+} from "@/component/utils/redux/slice/cmsApiSlice";
 
 export default function ContentSection({
   title,
@@ -8,22 +14,42 @@ export default function ContentSection({
   setCmsData,
   onSave,
 }) {
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const [isSaving, setIsSaving] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success");
+  const [pendingFile, setPendingFile] = useState(null); // ✅ Store file until save
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
+  const { data: apiData, isLoading, error, refetch } = useGetCmsSectionQuery(section);
+  const [saveSection] = useSaveCmsSectionMutation();
+  const [uploadImage] = useUploadImageMutation();
+
+  useEffect(() => {
+    if (apiData?.success && apiData?.data) {
       setCmsData((prev) => ({
         ...prev,
         [section]: {
-          ...prev[section],
-          image: file,
-          imagePreview: reader.result,
+          title: apiData.data.title || '',
+          description: apiData.data.description || '',
+          imageUrl: apiData.data.imageUrl || '',
+          imagePreview: apiData.data.imageUrl || '',
         },
       }));
-    };
-    reader.readAsDataURL(file);
+    }
+  }, [apiData, section, setCmsData]);
+
+  const showSuccessToast = (message) => {
+    setToastMessage(message);
+    setToastType("success");
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const showErrorToast = (message) => {
+    setToastMessage(message);
+    setToastType("error");
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 4000);
   };
 
   const handleInputChange = (field, value) => {
@@ -36,120 +62,325 @@ export default function ContentSection({
     }));
   };
 
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      showErrorToast('Please select a valid image file (JPG, PNG, WEBP, or GIF)');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      showErrorToast('File size must be less than 5MB');
+      return;
+    }
+
+    // ✅ Store file for later upload
+    setPendingFile(file);
+
+    // ✅ Create local preview URL (no backend upload yet)
+    const previewUrl = URL.createObjectURL(file);
+    handleInputChange("imagePreview", previewUrl);
+    
+    showSuccessToast('Image selected. Click "Save Changes" to upload.');
+  };
+
+  const handleRemoveImage = () => {
+    // Clear pending file
+    setPendingFile(null);
+    
+    // Revoke preview URL if it exists
+    if (data.imagePreview && data.imagePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(data.imagePreview);
+    }
+    
+    handleInputChange("imageUrl", "");
+    handleInputChange("imagePreview", "");
+    showSuccessToast('Image removed');
+  };
+
+  const handleChangeImage = () => {
+    document.getElementById("image-upload").click();
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+
+    try {
+      let finalImageUrl = data.imageUrl;
+
+      // ✅ Upload image ONLY if there's a pending file
+      if (pendingFile) {
+        try {
+          const uploadResult = await uploadImage(pendingFile).unwrap();
+          
+          if (uploadResult.success) {
+            finalImageUrl = uploadResult.imageUrl;
+            
+            // Clean up old preview URL
+            if (data.imagePreview && data.imagePreview.startsWith('blob:')) {
+              URL.revokeObjectURL(data.imagePreview);
+            }
+            
+            // Update with real URL
+            handleInputChange("imageUrl", finalImageUrl);
+            handleInputChange("imagePreview", finalImageUrl);
+            
+            // Clear pending file
+            setPendingFile(null);
+          } else {
+            throw new Error('Upload failed');
+          }
+        } catch (uploadError) {
+          console.error('Upload error:', uploadError);
+          showErrorToast('Failed to upload image');
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      // ✅ Save section data with uploaded image URL
+      const result = await saveSection({
+        section: section,
+        title: data.title,
+        description: data.description,
+        imageUrl: finalImageUrl,
+      }).unwrap();
+
+      if (result.success) {
+        showSuccessToast('Changes saved successfully!');
+        onSave(section);
+      } else {
+        showErrorToast('Failed to save changes');
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      showErrorToast('Error saving changes: ' + (error.data?.message || error.message));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (data.imagePreview && data.imagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(data.imagePreview);
+      }
+    };
+  }, [data.imagePreview]);
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-3xl border border-gray-200 shadow-xl p-20 text-center">
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-gray-500">Loading data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-3xl border border-gray-200 shadow-xl p-20 text-center">
+        <p className="text-red-500 mb-4">Failed to load data</p>
+        <button
+          onClick={() => refetch()}
+          className="px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="bg-gray-50 rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        {/* Header - Fixed gradient */}
-        <div className="bg-gradient-to-r from-emerald-500/10 via-emerald-400/5 to-transparent px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          <p className="text-sm text-gray-500 mt-1">
-            Edit the content for this section
-          </p>
+    <>
+      <div className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-500">
+        <div className="bg-white px-8 py-6 border-b border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Main hero section for the About page
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <Eye className="w-6 h-6 text-white" />
+            </div>
+          </div>
         </div>
 
-        {/* Body */}
-        <div className="p-6 space-y-5">
-          {/* Image block */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-900">
-              Section Image
+        <div className="p-8 space-y-8">
+          {/* Image Upload Section */}
+          <div className="space-y-3">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-900 uppercase tracking-wide">
+              <ImageIcon className="w-4 h-4 text-emerald-600" />
+              Hero Image
+              {pendingFile && (
+                <span className="ml-auto text-xs font-normal text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
+                  Pending upload
+                </span>
+              )}
             </label>
-            <div className="space-y-3">
-              <div className="relative group">
-                <div className="w-full h-48 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden transition-all group-hover:border-emerald-500/50">
-                  {data.imagePreview ? (
+
+            <div className="space-y-4">
+              {/* Hidden File Input */}
+              <input
+                type="file"
+                id="image-upload"
+                accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+
+              {/* Image Preview with Actions */}
+              {data.imagePreview ? (
+                <div className="space-y-3">
+                  <div className="relative group">
                     <img
                       src={data.imagePreview}
                       alt="Preview"
-                      className="w-full h-full object-cover"
+                      className="w-full h-64 object-cover rounded-2xl border-2 border-gray-200"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/800x400?text=Image+Not+Found';
+                      }}
                     />
-                  ) : (
-                    <div className="text-center">
-                      <ImageIcon className="w-10 h-10 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">
-                        No image selected
-                      </p>
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center gap-3">
+                      <button
+                        onClick={handleChangeImage}
+                        className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-all flex items-center gap-2"
+                      >
+                        <Upload className="w-4 h-4" />
+                        Change Image
+                      </button>
+                      <button
+                        onClick={handleRemoveImage}
+                        className="bg-red-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-600 transition-all flex items-center gap-2"
+                      >
+                        <X className="w-4 h-4" />
+                        Remove
+                      </button>
                     </div>
-                  )}
-                </div>
-
-                {/* Overlay upload button */}
-                <label className="absolute inset-0 flex items-center justify-center bg-white/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl cursor-pointer">
-                  <div className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg font-medium text-sm">
-                    <Upload className="w-4 h-4" />
-                    Upload Image
                   </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
+                </div>
+              ) : (
+                /* Upload Area */
+                <label
+                  htmlFor="image-upload"
+                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-2xl cursor-pointer transition-all border-emerald-300 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-400"
+                >
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Upload className="w-8 h-8 text-emerald-600" />
+                    </div>
+                    <p className="text-base font-semibold text-emerald-600">
+                      Click to select image
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      JPG, PNG, WEBP or GIF
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Maximum file size: 5MB
+                    </p>
+                  </div>
                 </label>
-
-                {/* Remove image button */}
-                {data.imagePreview && (
-                  <button
-                    type="button"
-                    onClick={() => handleInputChange("imagePreview", null)}
-                    className="absolute top-3 right-3 bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* URL input */}
-              <input
-                type="text"
-                value={data.imageUrl || ""}
-                onChange={(e) => handleInputChange("imageUrl", e.target.value)}
-                placeholder="Or enter image URL"
-                className="w-full px-4 py-2.5 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
-              />
+              )}
             </div>
           </div>
 
           {/* Title */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-900">
-              Title
+          <div className="space-y-3">
+            <label className="block text-sm font-semibold text-gray-900 uppercase tracking-wide">
+              Hero Title
             </label>
             <input
               type="text"
-              value={data.title}
+              value={data.title || ""}
               onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder="Enter section title"
-              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              placeholder="Enter hero title"
+              className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 font-medium"
             />
           </div>
 
           {/* Description */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-900">
-              Description
+          <div className="space-y-3">
+            <label className="block text-sm font-semibold text-gray-900 uppercase tracking-wide">
+              Hero Description
             </label>
-            <textarea
-              value={data.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="Enter section description"
-              rows={4}
-              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all resize-none"
-            />
+            <div className="relative">
+              <textarea
+                value={data.description || ""}
+                onChange={(e) => handleInputChange("description", e.target.value)}
+                placeholder="Write hero description"
+                rows={5}
+                className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 resize-none"
+              />
+              <div className="absolute bottom-4 right-4 text-xs text-gray-400 font-medium">
+                {data.description?.length || 0} characters
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Footer / Save */}
-        <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-200 flex justify-end">
-          <button
-            onClick={() => onSave(section)}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:opacity-90 transition-all shadow-lg hover:shadow-emerald-500/25"
-          >
-            <Save className="w-4 h-4" />
-            Save Changes
-          </button>
+        <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white border-t border-gray-100">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              {pendingFile ? (
+                <span className="text-amber-600 font-medium">
+                  ⚠ Image will be uploaded when you save
+                </span>
+              ) : (
+                "Changes will update the About page on your website"
+              )}
+            </p>
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className={`inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-8 py-3.5 rounded-xl font-semibold text-sm shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
+                isSaving ? "scale-95" : "hover:scale-105 hover:-translate-y-0.5"
+              }`}
+            >
+              {isSaving ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  {pendingFile ? "Uploading & Saving..." : "Saving..."}
+                </>
+              ) : (
+                <>
+                  <Save className="w-5 h-5" />
+                  Save Changes
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 duration-300">
+          <div
+            className={`${
+              toastType === "success"
+                ? "bg-gradient-to-r from-emerald-600 to-emerald-500"
+                : "bg-gradient-to-r from-red-600 to-red-500"
+            } text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border ${
+              toastType === "success" ? "border-emerald-400/20" : "border-red-400/20"
+            }`}
+          >
+            {toastType === "success" ? (
+              <CheckCircle2 className="w-5 h-5 animate-in zoom-in duration-300" />
+            ) : (
+              <AlertCircle className="w-5 h-5 animate-in zoom-in duration-300" />
+            )}
+            <span className="font-medium">{toastMessage}</span>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

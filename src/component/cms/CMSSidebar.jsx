@@ -5,25 +5,25 @@ export const sidebarItems = [
     id: "home-hero",
     label: "Home - Hero",
     icon: Home,
-    section: "homeHero"
+    section: "home-hero"
   },
-  {
-    id: "home-about",
-    label: "Home - About Us",
-    icon: Info,
-    section: "homeAbout"
-  },
-  {
-    id: "home-why",
-    label: "Home - Why Choose Us",
-    icon: Star,
-    section: "homeWhyChoose"
-  },
+  // {
+  //   id: "home-about",
+  //   label: "Home - About Us",
+  //   icon: Info,
+  //   section: "homeAbout"
+  // },
+  // {
+  //   id: "home-why",
+  //   label: "Home - Why Choose Us",
+  //   icon: Star,
+  //   section: "homeWhyChoose"
+  // },
   {
     id: "about-hero",
     label: "About - Hero",
     icon: FileText,
-    section: "aboutHero"
+    section: "about-hero"
   },
   {
     id: "products",

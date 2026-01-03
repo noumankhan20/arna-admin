@@ -44,7 +44,7 @@ export default function SelectPortal() {
       title: 'CMS Admin Panel',
       description: 'Create and manage content, pages, and media',
       icon: FileEdit,
-      route: '/cms/dashboard',
+      route: '/cms',
       color: 'from-teal-500 to-emerald-500',
     },
   ];
