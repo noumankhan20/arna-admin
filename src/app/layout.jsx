@@ -1,5 +1,5 @@
 import "./globals.css";
-import ReduxProvider from "@/component/utils/redux/provider";
+import ReduxProvider from "@/component/redux/provider";
 export const metadata = {
   title: "Arna Analytics",
   description: "Admin dashboard and CMS",

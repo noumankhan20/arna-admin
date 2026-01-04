@@ -5,7 +5,7 @@ import {
   useGetCmsSectionQuery,
   useSaveCmsSectionMutation,
   useUploadImageMutation,
-} from "@/component/utils/redux/slice/cmsApiSlice";
+} from "@/component/redux/slice/cmsApiSlice";
 
 export default function ContentSection({
   title,

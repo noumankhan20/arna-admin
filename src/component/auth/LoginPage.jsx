@@ -5,7 +5,7 @@ import { Eye, EyeOff, User, Lock, AlertCircle, Shield } from 'lucide-react';
 import Image from "next/image"
 import { useRouter } from 'next/navigation';
 import { toast } from "react-toastify";
-import { useLoginAdminMutation } from '../../../redux/slice/autApiSlice';
+import { useLoginAdminMutation } from '@/component/redux/slice/autApiSlice';
 
 export default function AdminLogin() {
   const [loginAdmin, { isLoading }] = useLoginAdminMutation();
