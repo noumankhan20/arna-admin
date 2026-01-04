@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LayoutDashboard, FileEdit, ChevronRight, LogOut } from 'lucide-react';
-import { useLogoutAdminMutation, useGetAdminQuery } from '../utils/redux/slice/autApiSlice';
+import { useLogoutAdminMutation, useGetAdminQuery } from '../../../redux/slice/autApiSlice';
 import { toast } from 'react-toastify';
 export default function SelectPortal() {
   const router = useRouter();
