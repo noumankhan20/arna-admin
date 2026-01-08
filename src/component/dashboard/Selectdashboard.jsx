@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LayoutDashboard, FileEdit, ChevronRight, LogOut } from 'lucide-react';
-import { useLogoutAdminMutation, useGetAdminQuery } from '../utils/redux/slice/autApiSlice';
+import { useLogoutAdminMutation, useGetAdminQuery } from '../redux/slice/autApiSlice';
 import { toast } from 'react-toastify';
 export default function SelectPortal() {
   const router = useRouter();
@@ -113,7 +113,7 @@ export default function SelectPortal() {
                   </p>
 
                   {/* Arrow Icon */}
-                  <div className="flex items-center cursor-pointer text-emerald-600 font-medium text-sm">
+                  <div className="flex items-center cursor-pointer text-gray-600 font-medium text-sm">
                     <span>Access Dashboard</span>
                     <ChevronRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform duration-300" />
                   </div>
