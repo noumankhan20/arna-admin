@@ -2,10 +2,10 @@
 import { Save, Image as ImageIcon, Eye, Upload, X, CheckCircle2, AlertCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
-  useGetCmsSectionQuery,
-  useSaveCmsSectionMutation,
-  useUploadImageMutation,
+  useGetAboutUsQuery,
+  useSaveAboutUsMutation,
 } from "@/component/utils/redux/slice/cmsApiSlice";
+
 
 export default function ContentSection({
   title,
@@ -20,23 +20,29 @@ export default function ContentSection({
   const [toastType, setToastType] = useState("success");
   const [pendingFile, setPendingFile] = useState(null); // ✅ Store file until save
 
-  const { data: apiData, isLoading, error, refetch } = useGetCmsSectionQuery(section);
-  const [saveSection] = useSaveCmsSectionMutation();
-  const [uploadImage] = useUploadImageMutation();
 
-  useEffect(() => {
-    if (apiData?.success && apiData?.data) {
-      setCmsData((prev) => ({
-        ...prev,
-        [section]: {
-          title: apiData.data.title || '',
-          description: apiData.data.description || '',
-          imageUrl: apiData.data.imageUrl || '',
-          imagePreview: apiData.data.imageUrl || '',
-        },
-      }));
-    }
-  }, [apiData, section, setCmsData]);
+  const { data: apiData, isLoading, error, refetch } = useGetAboutUsQuery();
+  const [saveAboutUs] = useSaveAboutUsMutation();
+
+
+useEffect(() => {
+  if (apiData?.success && apiData?.data) {
+    setCmsData((prev) => ({
+      ...prev,
+      [section]: {
+        title: apiData.data.title || '',
+        description: apiData.data.description || '',
+        imageUrl: apiData.data.imageUrl || '',
+        imagePreview: apiData.data.imageUrl 
+          ? `${process.env.NEXT_PUBLIC_BACKEND_API.replace('/api', '')}${apiData.data.imageUrl}` 
+          : '',
+      },
+    }));
+  }
+}, [apiData, section, setCmsData]);
+
+
+
 
   const showSuccessToast = (message) => {
     setToastMessage(message);
@@ -45,12 +51,14 @@ export default function ContentSection({
     setTimeout(() => setShowToast(false), 3000);
   };
 
+
   const showErrorToast = (message) => {
     setToastMessage(message);
     setToastType("error");
     setShowToast(true);
     setTimeout(() => setShowToast(false), 4000);
   };
+
 
   const handleInputChange = (field, value) => {
     setCmsData((prev) => ({
@@ -62,9 +70,11 @@ export default function ContentSection({
     }));
   };
 
+
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
 
     // Validate file type
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
@@ -73,14 +83,17 @@ export default function ContentSection({
       return;
     }
 
+
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       showErrorToast('File size must be less than 5MB');
       return;
     }
 
+
     // ✅ Store file for later upload
     setPendingFile(file);
+
 
     // ✅ Create local preview URL (no backend upload yet)
     const previewUrl = URL.createObjectURL(file);
@@ -88,6 +101,7 @@ export default function ContentSection({
     
     showSuccessToast('Image selected. Click "Save Changes" to upload.');
   };
+
 
   const handleRemoveImage = () => {
     // Clear pending file
@@ -103,67 +117,65 @@ export default function ContentSection({
     showSuccessToast('Image removed');
   };
 
+
   const handleChangeImage = () => {
     document.getElementById("image-upload").click();
   };
 
+
   const handleSave = async () => {
-    setIsSaving(true);
+  // Validate required fields
+  if (!data.title || !data.description) {
+    showErrorToast('Title and description are required');
+    return;
+  }
 
-    try {
-      let finalImageUrl = data.imageUrl;
+  setIsSaving(true);
 
-      // ✅ Upload image ONLY if there's a pending file
-      if (pendingFile) {
-        try {
-          const uploadResult = await uploadImage(pendingFile).unwrap();
-          
-          if (uploadResult.success) {
-            finalImageUrl = uploadResult.imageUrl;
-            
-            // Clean up old preview URL
-            if (data.imagePreview && data.imagePreview.startsWith('blob:')) {
-              URL.revokeObjectURL(data.imagePreview);
-            }
-            
-            // Update with real URL
-            handleInputChange("imageUrl", finalImageUrl);
-            handleInputChange("imagePreview", finalImageUrl);
-            
-            // Clear pending file
-            setPendingFile(null);
-          } else {
-            throw new Error('Upload failed');
-          }
-        } catch (uploadError) {
-          console.error('Upload error:', uploadError);
-          showErrorToast('Failed to upload image');
-          setIsSaving(false);
-          return;
-        }
-      }
+  try {
+    // ✅ Create FormData
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("description", data.description);
 
-      // ✅ Save section data with uploaded image URL
-      const result = await saveSection({
-        section: section,
-        title: data.title,
-        description: data.description,
-        imageUrl: finalImageUrl,
-      }).unwrap();
-
-      if (result.success) {
-        showSuccessToast('Changes saved successfully!');
-        onSave(section);
-      } else {
-        showErrorToast('Failed to save changes');
-      }
-    } catch (error) {
-      console.error('Save error:', error);
-      showErrorToast('Error saving changes: ' + (error.data?.message || error.message));
-    } finally {
-      setIsSaving(false);
+    // ✅ Only append image if user selected a new one
+    if (pendingFile) {
+      formData.append("image", pendingFile);
     }
-  };
+
+    // ✅ Save to backend (image upload happens automatically)
+    const result = await saveAboutUs(formData).unwrap();
+
+    if (result.success) {
+      showSuccessToast(result.message || 'Changes saved successfully!');
+      
+      // Clean up old preview URL
+      if (data.imagePreview && data.imagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(data.imagePreview);
+      }
+      
+      // ✅ Update with real URL from backend (strip /api from URL)
+      handleInputChange("imageUrl", result.data.imageUrl);
+      handleInputChange("imagePreview", `${process.env.NEXT_PUBLIC_BACKEND_API.replace('/api', '')}${result.data.imageUrl}`);
+      
+      // Clear pending file
+      setPendingFile(null);
+      
+      onSave(section);
+      refetch();
+    } else {
+      showErrorToast('Failed to save changes');
+    }
+  } catch (error) {
+    console.error('Save error:', error);
+    showErrorToast('Error saving changes: ' + (error.data?.message || error.message));
+  } finally {
+    setIsSaving(false);
+  }
+};
+
+
+
 
   // Cleanup on unmount
   useEffect(() => {
@@ -174,6 +186,7 @@ export default function ContentSection({
     };
   }, [data.imagePreview]);
 
+
   if (isLoading) {
     return (
       <div className="bg-white rounded-3xl border border-gray-200 shadow-xl p-20 text-center">
@@ -182,6 +195,7 @@ export default function ContentSection({
       </div>
     );
   }
+
 
   if (error) {
     return (
@@ -196,6 +210,7 @@ export default function ContentSection({
       </div>
     );
   }
+
 
   return (
     <>
@@ -214,6 +229,7 @@ export default function ContentSection({
           </div>
         </div>
 
+
         <div className="p-8 space-y-8">
           {/* Image Upload Section */}
           <div className="space-y-3">
@@ -227,6 +243,7 @@ export default function ContentSection({
               )}
             </label>
 
+
             <div className="space-y-4">
               {/* Hidden File Input */}
               <input
@@ -236,6 +253,7 @@ export default function ContentSection({
                 onChange={handleFileSelect}
                 className="hidden"
               />
+
 
               {/* Image Preview with Actions */}
               {data.imagePreview ? (
@@ -292,6 +310,7 @@ export default function ContentSection({
             </div>
           </div>
 
+
           {/* Title */}
           <div className="space-y-3">
             <label className="block text-sm font-semibold text-gray-900 uppercase tracking-wide">
@@ -305,6 +324,7 @@ export default function ContentSection({
               className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-base text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-300 font-medium"
             />
           </div>
+
 
           {/* Description */}
           <div className="space-y-3">
@@ -325,6 +345,7 @@ export default function ContentSection({
             </div>
           </div>
         </div>
+
 
         <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white border-t border-gray-100">
           <div className="flex items-center justify-between">
@@ -359,6 +380,7 @@ export default function ContentSection({
           </div>
         </div>
       </div>
+
 
       {/* Toast Notification */}
       {showToast && (

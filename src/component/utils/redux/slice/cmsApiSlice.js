@@ -2,77 +2,41 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const cmsApi = createApi({
   reducerPath: "cmsApi",
-  tagTypes: ["CMS"],
+  tagTypes: ["AboutUs"],
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_BACKEND_API,
     credentials: "include",
   }),
   endpoints: (builder) => ({
-    // Get single CMS section
-    getCmsSection: builder.query({
-      query: (section) => `/cms/about?section=${section}`,
-      providesTags: (result, error, section) => [{ type: "CMS", id: section }],
-    }),
-
-    // Get all CMS sections
-    getAllCmsSections: builder.query({
+    // Get About Us section
+    getAboutUs: builder.query({
       query: () => "/cms/about",
-      providesTags: ["CMS"],
+      providesTags: ["AboutUs"],
     }),
 
-    // Save/Update CMS section
-    saveCmsSection: builder.mutation({
-      query: (data) => ({
+    // Create or Update About Us (with image upload)
+    saveAboutUs: builder.mutation({
+      query: (formData) => ({
         url: "/cms/about",
         method: "POST",
-        body: data,
+        body: formData, // FormData object containing title, description, and image
       }),
-      invalidatesTags: (result, error, { section }) => [
-        { type: "CMS", id: section },
-        "CMS",
-      ],
+      invalidatesTags: ["AboutUs"],
     }),
 
-    // Delete CMS section
-    deleteCmsSection: builder.mutation({
-      query: (section) => ({
-        url: `/cms/about/${section}`,
+    // Delete About Us section (soft delete)
+    deleteAboutUs: builder.mutation({
+      query: () => ({
+        url: "/cms/about",
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, section) => [
-        { type: "CMS", id: section },
-        "CMS",
-      ],
-    }),
-
-    // Upload image
-    uploadImage: builder.mutation({
-      query: (file) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        return {
-          url: "/cms/upload",
-          method: "POST",
-          body: formData,
-        };
-      },
-    }),
-
-    // Delete image
-    deleteImage: builder.mutation({
-      query: (filename) => ({
-        url: `/cms/upload/${filename}`,
-        method: "DELETE",
-      }),
+      invalidatesTags: ["AboutUs"],
     }),
   }),
 });
 
 export const {
-  useGetCmsSectionQuery,
-  useGetAllCmsSectionsQuery,
-  useSaveCmsSectionMutation,
-  useDeleteCmsSectionMutation,
-  useUploadImageMutation,
-  useDeleteImageMutation,
+  useGetAboutUsQuery,
+  useSaveAboutUsMutation,
+  useDeleteAboutUsMutation,
 } = cmsApi;
