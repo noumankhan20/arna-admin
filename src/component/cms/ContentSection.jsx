@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import {
   useGetAboutUsQuery,
   useSaveAboutUsMutation,
-} from "@/component/utils/redux/slice/cmsApiSlice";
+} from "@/component/redux/slice/cmsApiSlice";
 
 
 export default function ContentSection({
