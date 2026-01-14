@@ -47,7 +47,7 @@ export default function ContentSection({
           description: apiData.data.description || '',
           imageUrl: apiData.data.imageUrl || '',
           imagePreview: apiData.data.imageUrl
-            ? `${process.env.NEXT_PUBLIC_BACKEND_API.replace('/api', '')}${apiData.data.imageUrl}`
+            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${apiData.data.imageUrl}`
             : '',
         },
       }));
