@@ -4,7 +4,10 @@ import { useState, useEffect } from "react";
 import {
   useGetAboutUsQuery,
   useSaveAboutUsMutation,
+  useGetHomeHeroQuery,
+  useSaveHomeHeroMutation,
 } from "@/component/redux/slice/cmsApiSlice";
+
 
 
 export default function ContentSection({
@@ -21,25 +24,35 @@ export default function ContentSection({
   const [pendingFile, setPendingFile] = useState(null); // ✅ Store file until save
 
 
-  const { data: apiData, isLoading, error, refetch } = useGetAboutUsQuery();
-  const [saveAboutUs] = useSaveAboutUsMutation();
+  const isHomeHero = section === "home-hero";
+
+  const {
+    data: apiData,
+    isLoading,
+    error,
+    refetch,
+  } = isHomeHero ? useGetHomeHeroQuery() : useGetAboutUsQuery();
+
+  const [saveData] = isHomeHero
+    ? useSaveHomeHeroMutation()
+    : useSaveAboutUsMutation();
 
 
-useEffect(() => {
-  if (apiData?.success && apiData?.data) {
-    setCmsData((prev) => ({
-      ...prev,
-      [section]: {
-        title: apiData.data.title || '',
-        description: apiData.data.description || '',
-        imageUrl: apiData.data.imageUrl || '',
-        imagePreview: apiData.data.imageUrl 
-          ? `${process.env.NEXT_PUBLIC_BACKEND_API.replace('/api', '')}${apiData.data.imageUrl}` 
-          : '',
-      },
-    }));
-  }
-}, [apiData, section, setCmsData]);
+  useEffect(() => {
+    if (apiData?.success && apiData?.data) {
+      setCmsData((prev) => ({
+        ...prev,
+        [section]: {
+          title: apiData.data.title || '',
+          description: apiData.data.description || '',
+          imageUrl: apiData.data.imageUrl || '',
+          imagePreview: apiData.data.imageUrl
+            ? `${process.env.NEXT_PUBLIC_BACKEND_API.replace('/api', '')}${apiData.data.imageUrl}`
+            : '',
+        },
+      }));
+    }
+  }, [apiData, section, setCmsData]);
 
 
 
@@ -98,7 +111,7 @@ useEffect(() => {
     // ✅ Create local preview URL (no backend upload yet)
     const previewUrl = URL.createObjectURL(file);
     handleInputChange("imagePreview", previewUrl);
-    
+
     showSuccessToast('Image selected. Click "Save Changes" to upload.');
   };
 
@@ -106,12 +119,12 @@ useEffect(() => {
   const handleRemoveImage = () => {
     // Clear pending file
     setPendingFile(null);
-    
+
     // Revoke preview URL if it exists
     if (data.imagePreview && data.imagePreview.startsWith('blob:')) {
       URL.revokeObjectURL(data.imagePreview);
     }
-    
+
     handleInputChange("imageUrl", "");
     handleInputChange("imagePreview", "");
     showSuccessToast('Image removed');
@@ -124,55 +137,55 @@ useEffect(() => {
 
 
   const handleSave = async () => {
-  // Validate required fields
-  if (!data.title || !data.description) {
-    showErrorToast('Title and description are required');
-    return;
-  }
-
-  setIsSaving(true);
-
-  try {
-    // ✅ Create FormData
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("description", data.description);
-
-    // ✅ Only append image if user selected a new one
-    if (pendingFile) {
-      formData.append("image", pendingFile);
+    // Validate required fields
+    if (!data.title || !data.description) {
+      showErrorToast('Title and description are required');
+      return;
     }
 
-    // ✅ Save to backend (image upload happens automatically)
-    const result = await saveAboutUs(formData).unwrap();
+    setIsSaving(true);
 
-    if (result.success) {
-      showSuccessToast(result.message || 'Changes saved successfully!');
-      
-      // Clean up old preview URL
-      if (data.imagePreview && data.imagePreview.startsWith('blob:')) {
-        URL.revokeObjectURL(data.imagePreview);
+    try {
+      // ✅ Create FormData
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description);
+
+      // ✅ Only append image if user selected a new one
+      if (pendingFile) {
+        formData.append("image", pendingFile);
       }
-      
-      // ✅ Update with real URL from backend (strip /api from URL)
-      handleInputChange("imageUrl", result.data.imageUrl);
-      handleInputChange("imagePreview", `${process.env.NEXT_PUBLIC_BACKEND_API.replace('/api', '')}${result.data.imageUrl}`);
-      
-      // Clear pending file
-      setPendingFile(null);
-      
-      onSave(section);
-      refetch();
-    } else {
-      showErrorToast('Failed to save changes');
+
+      // ✅ Save to backend (image upload happens automatically)
+      const result = await saveData(formData).unwrap();
+
+      if (result.success) {
+        showSuccessToast(result.message || 'Changes saved successfully!');
+
+        // Clean up old preview URL
+        if (data.imagePreview && data.imagePreview.startsWith('blob:')) {
+          URL.revokeObjectURL(data.imagePreview);
+        }
+
+        // ✅ Update with real URL from backend (strip /api from URL)
+        handleInputChange("imageUrl", result.data.imageUrl);
+        handleInputChange("imagePreview", `${process.env.NEXT_PUBLIC_BACKEND_API.replace('/api', '')}${result.data.imageUrl}`);
+
+        // Clear pending file
+        setPendingFile(null);
+
+        onSave(section);
+        refetch();
+      } else {
+        showErrorToast('Failed to save changes');
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      showErrorToast('Error saving changes: ' + (error.data?.message || error.message));
+    } finally {
+      setIsSaving(false);
     }
-  } catch (error) {
-    console.error('Save error:', error);
-    showErrorToast('Error saving changes: ' + (error.data?.message || error.message));
-  } finally {
-    setIsSaving(false);
-  }
-};
+  };
 
 
 
@@ -361,9 +374,8 @@ useEffect(() => {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className={`inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-8 py-3.5 rounded-xl font-semibold text-sm shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
-                isSaving ? "scale-95" : "hover:scale-105 hover:-translate-y-0.5"
-              }`}
+              className={`inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-8 py-3.5 rounded-xl font-semibold text-sm shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${isSaving ? "scale-95" : "hover:scale-105 hover:-translate-y-0.5"
+                }`}
             >
               {isSaving ? (
                 <>
@@ -386,13 +398,11 @@ useEffect(() => {
       {showToast && (
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 duration-300">
           <div
-            className={`${
-              toastType === "success"
-                ? "bg-gradient-to-r from-emerald-600 to-emerald-500"
-                : "bg-gradient-to-r from-red-600 to-red-500"
-            } text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border ${
-              toastType === "success" ? "border-emerald-400/20" : "border-red-400/20"
-            }`}
+            className={`${toastType === "success"
+              ? "bg-gradient-to-r from-emerald-600 to-emerald-500"
+              : "bg-gradient-to-r from-red-600 to-red-500"
+              } text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border ${toastType === "success" ? "border-emerald-400/20" : "border-red-400/20"
+              }`}
           >
             {toastType === "success" ? (
               <CheckCircle2 className="w-5 h-5 animate-in zoom-in duration-300" />

@@ -1,10 +1,11 @@
 export const initialCMSData = {
   "home-hero": {
-    image: null,
-    imagePreview: null,
-    title: 'Welcome to Arna Skin Care',
-    description: 'Discover natural beauty solutions that transform your skin'
+    title: "",
+    description: "",
+    imageUrl: "",
+    imagePreview: "",
   },
+
   // homeAbout: {
   //   image: null,
   //   imagePreview: null,
@@ -50,11 +51,11 @@ export const initialCMSData = {
     description: 'Learn about our journey to becoming a trusted skincare brand'
   },
   products: [
-    { 
-      id: 1, 
-      image: null, 
+    {
+      id: 1,
+      image: null,
       imagePreview: null,
-      name: 'Vitamin C Serum', 
+      name: 'Vitamin C Serum',
       description: 'Brightening serum for radiant skin',
       price: 29.99,
       inStock: true
