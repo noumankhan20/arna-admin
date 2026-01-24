@@ -37,6 +37,16 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40 relative overflow-hidden">
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      >
+        <source src="/final.mp4" type="video/mp4" />
+      </video>
       {/* Modern Animated Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 rounded-full blur-3xl animate-pulse"></div>
@@ -49,22 +59,12 @@ export default function AdminLogin() {
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 relative">
           {/* Gradient Border Effect */}
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-indigo-500/10 pointer-events-none"></div>
-          
+
           {/* Header Section */}
           <div className="relative px-8 pt-10 pb-8">
             <div className="flex items-center justify-center mb-6">
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-500 to-black blur-2xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                <div className="relative bg-gradient-to-br from-gray-600 to-black p-4 rounded-2xl shadow-lg">
-                  <Image
-                    src="/arna-logo.webp"
-                    alt="Arna Logo"
-                    width={48}
-                    height={48}
-                    className="object-contain brightness-0 invert"
-                    priority
-                  />
-                </div>
               </div>
             </div>
             <h1 className="text-3xl font-bold text-center mb-3 bg-gradient-to-r from-gray-600 to-black bg-clip-text text-transparent">
@@ -73,8 +73,11 @@ export default function AdminLogin() {
             <p className="text-slate-600 text-center text-sm mb-2">
               Sign in to access your dashboard
             </p>
-            <p className="text-slate-400 text-center text-xs font-light italic">
-              "Indeed with hardship it comes ease"
+            <p className="text-black text-center text-xs font-bold italic">
+              "So surely with hardship comes ease."
+            </p>
+            <p className="text-slate-500 text-[10px] text-center mt-1">
+              — Qur’an 94:5
             </p>
           </div>
 
@@ -98,9 +101,8 @@ export default function AdminLogin() {
                   Email Address
                 </label>
                 <div className="relative group">
-                  <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-all duration-300 ${
-                    focusedField === 'email' ? 'text-black' : 'text-slate-400'
-                  }`}>
+                  <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-all duration-300 ${focusedField === 'email' ? 'text-black' : 'text-slate-400'
+                    }`}>
                     <User className="h-5 w-5" />
                   </div>
                   <input
@@ -123,9 +125,8 @@ export default function AdminLogin() {
                   Password
                 </label>
                 <div className="relative group">
-                  <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-all duration-300 ${
-                    focusedField === 'password' ? 'text-black' : 'text-slate-400'
-                  }`}>
+                  <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-all duration-300 ${focusedField === 'password' ? 'text-black' : 'text-slate-400'
+                    }`}>
                     <Lock className="h-5 w-5" />
                   </div>
                   <input
