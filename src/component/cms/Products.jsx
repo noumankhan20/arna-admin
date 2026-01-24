@@ -8,6 +8,7 @@ import {
   useDeleteProductMutation
 } from "../redux/slice/productApiSlice";
 import { PRODUCT_CATEGORIES } from "../constants/product.constants";
+
 export default function ProductsSection({ showSuccessToast }) {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -29,7 +30,7 @@ export default function ProductsSection({ showSuccessToast }) {
       name: '',
       slug: '',
       description: '',
-      category: '', // ✅ ADD
+      category: '',
       price: '',
       salePrice: '',
       isBestSeller: false,
@@ -183,7 +184,7 @@ export default function ProductsSection({ showSuccessToast }) {
       <div className="space-y-6">
         <div className="bg-gray-50 rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-emerald-500/10 via-emerald-400/5 to-transparent px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div className="bg-gradient-to-r from-emerald-500/10 via-emerald-400/5 to-transparent px-6 py-4 border-b border-gray-200 flex items-center justify-between cursor-pointer">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
                 {editingProduct._id ? 'Edit Product' : 'Add New Product'}
@@ -273,13 +274,11 @@ export default function ProductsSection({ showSuccessToast }) {
               />
             </div>
 
-
             {/* Category */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-900">
                 Category <span className="text-red-500">*</span>
               </label>
-
               <select
                 value={editingProduct.category}
                 onChange={(e) =>
@@ -298,7 +297,6 @@ export default function ProductsSection({ showSuccessToast }) {
                 ))}
               </select>
             </div>
-
 
             {/* Price & Sale Price */}
             <div className="grid grid-cols-2 gap-4">
@@ -410,7 +408,7 @@ export default function ProductsSection({ showSuccessToast }) {
         </div>
         <button
           onClick={handleAddProduct}
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:opacity-90 transition-all shadow-lg hover:shadow-emerald-500/25"
+          className="inline-flex items-center cursor-pointer gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:opacity-90 transition-all shadow-lg hover:shadow-emerald-500/25"
         >
           <Plus className="w-4 h-4" />
           Add Product
@@ -428,9 +426,9 @@ export default function ProductsSection({ showSuccessToast }) {
           {products.map(product => (
             <div
               key={product._id}
-              className="group bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300"
+              className="group bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300 flex flex-col h-full"
             >
-              <div className="relative aspect-square bg-gray-100 overflow-hidden">
+              <div className="relative aspect-square bg-gray-100 overflow-hidden flex-shrink-0">
                 {product.image ? (
                   <img
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${product.image}`}
@@ -461,28 +459,30 @@ export default function ProductsSection({ showSuccessToast }) {
                 <div className="absolute bottom-3 left-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
                   <button
                     onClick={() => handleEditProduct(product)}
-                    className="flex-1 flex items-center justify-center gap-2 bg-emerald-500 text-white py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                    className="flex-1 flex items-center cursor-pointer justify-center gap-2 bg-emerald-500 text-white py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                   >
                     <Edit className="w-4 h-4" />
                     Edit
                   </button>
                 </div>
               </div>
-              <div className="p-5">
-                <div className="flex items-start justify-between gap-3">
+              
+              <div className="p-5 flex flex-col flex-grow">
+                <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-900 truncate">{product.name}</h4>
-                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">{product.description}</p>
+                    <h4 className="font-semibold text-gray-900 truncate mb-2">{product.name}</h4>
+                    <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">{product.description}</p>
                   </div>
                   <button
                     onClick={() => handleDeleteProduct(product._id)}
                     disabled={isDeleting}
-                    className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-100 rounded-lg transition-colors flex-shrink-0 disabled:opacity-50"
+                    className="p-2 text-gray-500 hover:text-red-500 cursor-pointer hover:bg-red-100 rounded-lg transition-colors flex-shrink-0 disabled:opacity-50"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-200 flex items-center gap-2">
+                
+                <div className="mt-auto pt-4 border-t border-gray-200 flex items-center gap-2">
                   {product.salePrice ? (
                     <>
                       <span className="text-xl font-bold text-emerald-600">₹{product.salePrice}</span>

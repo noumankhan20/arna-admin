@@ -30,5 +30,11 @@ export const sidebarItems = [
     label: "Products",
     icon: Package,
     section: "products"
+  },
+  {
+    id: "pop-model",
+    label: "Sponsor a POP Model",
+    icon: Package,
+    section: "pop-model"
   }
 ];
