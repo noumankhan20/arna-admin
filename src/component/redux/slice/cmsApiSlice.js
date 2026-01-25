@@ -1,22 +1,14 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { apiSlice } from "./apiSlice";
 
-export const cmsApi = createApi({
-  reducerPath: "cmsApi",
-  tagTypes: ["AboutUs"], // keep existing tag
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_BACKEND_API,
-    credentials: "include",
-  }),
+export const cmsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    /* ---------------- ABOUT US (EXISTING - UNCHANGED) ---------------- */
+    /* ---------------- ABOUT US ---------------- */
 
-    // Get About Us section
     getAboutUs: builder.query({
       query: () => "/cms/about",
       providesTags: ["AboutUs"],
     }),
 
-    // Create or Update About Us
     saveAboutUs: builder.mutation({
       query: (formData) => ({
         url: "/cms/about",
@@ -26,7 +18,6 @@ export const cmsApi = createApi({
       invalidatesTags: ["AboutUs"],
     }),
 
-    // Delete About Us section
     deleteAboutUs: builder.mutation({
       query: () => ({
         url: "/cms/about",
@@ -35,15 +26,13 @@ export const cmsApi = createApi({
       invalidatesTags: ["AboutUs"],
     }),
 
-    /* ---------------- HOME HERO (NEW - ADDITIVE) ---------------- */
+    /* ---------------- HOME HERO ---------------- */
 
-    // Get Home Hero section
     getHomeHero: builder.query({
       query: () => "/cms/hero",
-      providesTags: ["AboutUs"], // reuse tag to avoid touching cache logic
+      providesTags: ["AboutUs"],
     }),
 
-    // Create or Update Home Hero
     saveHomeHero: builder.mutation({
       query: (formData) => ({
         url: "/cms/hero",
@@ -55,15 +44,10 @@ export const cmsApi = createApi({
   }),
 });
 
-/* ---------------- EXPORTS ---------------- */
-
 export const {
-  // About Us (existing)
   useGetAboutUsQuery,
   useSaveAboutUsMutation,
   useDeleteAboutUsMutation,
-
-  // Home Hero (new)
   useGetHomeHeroQuery,
   useSaveHomeHeroMutation,
 } = cmsApi;

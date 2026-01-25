@@ -8,6 +8,7 @@ import { initialCMSData } from './initialCMSData';
 import { sidebarItems } from './CMSSidebar';
 import ContentSection from './ContentSection';
 import ProductsSection from './Products';
+import PromoMain from "./Promos/PromoMain"; // Your existing import
 import Image from 'next/image';
 
 export default function CMSAdminPanel() {
@@ -142,7 +143,6 @@ export default function CMSAdminPanel() {
 
         <main className="flex-1 p-6 lg:p-8 overflow-y-auto overflow-x-hidden">
           <div className="max-w-5xl mx-auto">
-            {/* ✅ Changed all section names to kebab-case */}
             {activeSection === 'home-hero' && (
               <ContentSection
                 title="Home Hero Section"
@@ -169,6 +169,11 @@ export default function CMSAdminPanel() {
                 setCmsData={setCmsData}
                 showSuccessToast={showSuccessToast}
               />
+            )}
+
+            {/* ✅ ADD PROMO SECTION HERE */}
+            {activeSection === 'promos' && (
+              <PromoMain />
             )}
           </div>
         </main>

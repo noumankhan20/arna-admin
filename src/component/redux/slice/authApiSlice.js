@@ -1,12 +1,6 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { apiSlice } from "./apiSlice";
 
-export const authApi = createApi({
-  reducerPath: "authApi",
-  tagTypes:["Admin"],
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_BACKEND_API,
-    credentials: "include", // IMPORTANT for cookies
-  }),
+export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     loginAdmin: builder.mutation({
       query: (data) => ({
@@ -21,13 +15,13 @@ export const authApi = createApi({
         url: "/admin/logout",
         method: "POST",
       }),
-     invalidatesTags: ["Admin"],
+      invalidatesTags: ["Admin"],
     }),
 
     getAdmin: builder.query({
       query: () => "/admin/me",
       providesTags: ["Admin"],
-    }), 
+    }),
   }),
 });
 
