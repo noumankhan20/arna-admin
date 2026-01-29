@@ -58,24 +58,6 @@ export default function PromoFilters({
             <option value="false">Inactive</option>
           </select>
         </div>
-
-        {/* Applies To Filter */}
-        <div>
-          <label htmlFor="appliesTo" className="block text-sm font-medium text-gray-700 mb-2">
-            Applies To
-          </label>
-          <select
-            id="appliesTo"
-            value={appliesToFilter}
-            onChange={(e) => onAppliesToChange(e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all bg-white"
-          >
-            <option value="">All Types</option>
-            <option value="all">All Products</option>
-            <option value="product">Product</option>
-            <option value="category">Category</option>
-          </select>
-        </div>
       </div>
     </div>
   );

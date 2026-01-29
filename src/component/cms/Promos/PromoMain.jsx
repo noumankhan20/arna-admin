@@ -61,16 +61,21 @@ export default function PromosPage() {
   const handleFormSubmit = async (formData) => {
     try {
       if (editPromo) {
-        await updatePromo({ id: editPromo._id, ...formData }).unwrap();
+        await updatePromo({
+          id: editPromo._id,
+          body: formData, // 👈 IMPORTANT
+        }).unwrap();
       } else {
         await createPromo(formData).unwrap();
       }
+
       handleFormClose();
     } catch (error) {
       console.error('Failed to save promo:', error);
       alert(error?.data?.message || 'Failed to save promo code. Please try again.');
     }
   };
+
 
   const handleDeleteClick = (id, code) => {
     setDeleteModal({ isOpen: true, id, code });

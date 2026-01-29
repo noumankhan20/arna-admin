@@ -10,9 +10,11 @@ export default function PromoCard({ promo, onEdit, onDelete, onToggle, isTogglin
   };
 
   const formatAppliesTo = (type) => {
+    if (!type) return '—'; // IMAGE / Banner promos
     if (type === 'all') return 'All Products';
     return type.charAt(0).toUpperCase() + type.slice(1);
   };
+
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -26,11 +28,10 @@ export default function PromoCard({ promo, onEdit, onDelete, onToggle, isTogglin
             <button
               onClick={() => onToggle(promo._id)}
               disabled={isToggling}
-              className={`text-xs font-medium px-2 py-1 rounded transition-colors ${
-                promo.isActive
+              className={`text-xs font-medium px-2 py-1 rounded transition-colors ${promo.isActive
                   ? 'bg-green-100 text-green-700'
                   : 'bg-red-100 text-red-700'
-              }`}
+                }`}
             >
               {promo.isActive ? 'Active' : 'Inactive'}
             </button>

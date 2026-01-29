@@ -9,11 +9,6 @@ export default function PromoTable({ promos, onEdit, onDelete, onToggle, isToggl
     return `₹${promo.discountValue}`;
   };
 
-  const formatAppliesTo = (type) => {
-    if (type === 'all') return 'All Products';
-    return type.charAt(0).toUpperCase() + type.slice(1);
-  };
-
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
@@ -28,9 +23,6 @@ export default function PromoTable({ promos, onEdit, onDelete, onToggle, isToggl
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Discount
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                Applies To
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Status
@@ -62,17 +54,13 @@ export default function PromoTable({ promos, onEdit, onDelete, onToggle, isToggl
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm text-gray-900">{formatAppliesTo(promo.appliesTo)}</span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
                   <button
                     onClick={() => onToggle(promo._id)}
                     disabled={isToggling}
-                    className={`inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                      promo.isActive
+                    className={`inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors ${promo.isActive
                         ? 'bg-green-100 text-green-700 hover:bg-green-200'
                         : 'bg-red-100 text-red-700 hover:bg-red-200'
-                    } disabled:opacity-50`}
+                      } disabled:opacity-50`}
                   >
                     {promo.isActive ? 'Active' : 'Inactive'}
                   </button>
