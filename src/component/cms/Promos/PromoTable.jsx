@@ -41,7 +41,9 @@ export default function PromoTable({ promos, onEdit, onDelete, onToggle, isToggl
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-sm font-medium text-gray-900">{promo.title}</div>
+                  <div className="text-sm font-medium text-gray-900">
+                    {promo.promoType === 'IMAGE' ? 'Banner Promo' : promo.title}
+                  </div>
                   {promo.description && (
                     <div className="text-sm text-gray-500 max-w-xs truncate">
                       {promo.description}
@@ -49,22 +51,38 @@ export default function PromoTable({ promos, onEdit, onDelete, onToggle, isToggl
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm font-semibold text-gray-900">
-                    {formatDiscount(promo)}
-                  </span>
+                  {promo.promoType === 'IMAGE' ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                      🖼 Image Promo
+                    </span>
+                  ) : (
+                    <span className="text-sm font-semibold text-gray-900">
+                      {formatDiscount(promo)}
+                    </span>
+                  )}
                 </td>
+
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    onClick={() => onToggle(promo._id)}
-                    disabled={isToggling}
-                    className={`inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors ${promo.isActive
-                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                        : 'bg-red-100 text-red-700 hover:bg-red-200'
-                      } disabled:opacity-50`}
-                  >
-                    {promo.isActive ? 'Active' : 'Inactive'}
-                  </button>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={promo.isActive}
+                      disabled={isToggling}
+                      onChange={() => onToggle(promo._id)}
+                      className="sr-only peer"
+                    />
+                    <div
+                      className="
+        relative w-11 h-6 bg-gray-200 rounded-full
+        peer peer-checked:bg-emerald-500
+        after:content-[''] after:absolute after:top-[2px] after:left-[2px]
+        after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all
+        peer-checked:after:translate-x-full
+      "
+                    />
+                  </label>
                 </td>
+
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex items-center justify-end gap-2">
                     <button
