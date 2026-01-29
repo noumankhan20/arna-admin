@@ -71,7 +71,7 @@ export default function PromoFormModal({ isOpen, onClose, onSubmit, editPromo, i
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        
+
         if (name === 'promoType') {
             if (value === 'IMAGE') {
                 // Clear fields that aren't needed for IMAGE type
@@ -114,39 +114,25 @@ export default function PromoFormModal({ isOpen, onClose, onSubmit, editPromo, i
 
         if (formData.startDate) fd.append('startDate', formData.startDate);
         if (formData.endDate) fd.append('endDate', formData.endDate);
-        fd.append('showAsPopup', formData.showAsPopup);
+        fd.append('showAsPopup', String(formData.showAsPopup));
 
         if (formData.promoType === 'IMAGE') {
-            if (!formData.bannerImage) {
+            if (!editPromo && !formData.bannerImage) {
                 alert('Banner image is required');
                 return;
             }
-            fd.append('bannerImage', formData.bannerImage);
+
+            // Only append if user selected a new file
+            if (formData.bannerImage) {
+                fd.append('bannerImage', formData.bannerImage);
+            }
         } else {
             fd.append('title', formData.title);
             fd.append('discountType', formData.discountType);
             fd.append('discountValue', Number(formData.discountValue));
-            fd.append('appliesTo', formData.appliesTo);
-
             if (formData.description) fd.append('description', formData.description);
-            if (formData.minOrderValue) fd.append('minOrderValue', Number(formData.minOrderValue));
             if (formData.maxDiscount && formData.discountType === 'percentage') {
                 fd.append('maxDiscount', Number(formData.maxDiscount));
-            }
-
-            if (
-                formData.influencerName ||
-                formData.influencerInstagram ||
-                formData.influencerCodeOwner
-            ) {
-                fd.append(
-                    'influencer',
-                    JSON.stringify({
-                        name: formData.influencerName,
-                        instagram: formData.influencerInstagram,
-                        codeOwner: formData.influencerCodeOwner,
-                    })
-                );
             }
         }
 
