@@ -38,21 +38,30 @@ export default function ContentSection({
     : useSaveAboutUsMutation();
 
 
-  useEffect(() => {
-    if (apiData?.success && apiData?.data) {
-      setCmsData((prev) => ({
+useEffect(() => {
+  if (apiData?.success && apiData?.data) {
+    setCmsData((prev) => {
+      const prevSection = prev[section] || {};
+      const rawImageUrl = apiData.data.imageUrl;
+
+      return {
         ...prev,
         [section]: {
-          title: apiData.data.title || '',
-          description: apiData.data.description || '',
-          imageUrl: apiData.data.imageUrl || '',
-          imagePreview: apiData.data.imageUrl
-            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${apiData.data.imageUrl}`
-            : '',
+          title: apiData.data.title ?? prevSection.title ?? '',
+          description: apiData.data.description ?? prevSection.description ?? '',
+          imageUrl: rawImageUrl ?? prevSection.imageUrl ?? '',
+          imagePreview: rawImageUrl
+            ? rawImageUrl.startsWith("http")
+              ? rawImageUrl
+              : `${process.env.NEXT_PUBLIC_BACKEND_URL}${rawImageUrl}`
+            : prevSection.imagePreview ?? '',
         },
-      }));
-    }
-  }, [apiData, section, setCmsData]);
+      };
+    });
+  }
+}, [apiData, section, setCmsData]);
+
+
 
 
 
@@ -137,8 +146,7 @@ export default function ContentSection({
 
 
   const handleSave = async () => {
-    // Validate required fields
-    if (!data.title || !data.description) {
+    if (!data.title?.trim() || !data.description?.trim()) {
       showErrorToast('Title and description are required');
       return;
     }
@@ -146,42 +154,35 @@ export default function ContentSection({
     setIsSaving(true);
 
     try {
-      // ✅ Create FormData
       const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("description", data.description);
-
-      // ✅ Only append image if user selected a new one
+      formData.append("title", data.title.trim());
+      formData.append("description", data.description.trim());
+      
       if (pendingFile) {
         formData.append("image", pendingFile);
       }
 
-      // ✅ Save to backend (image upload happens automatically)
-      const result = await saveData(formData).unwrap();
+      // ✅ Backend handles both CREATE & UPDATE automatically
+      await saveData(formData).unwrap();
+      
+      showSuccessToast('Saved successfully!');
+      
+      // Cleanup
+      if (pendingFile) setPendingFile(null);
+      if (
+  apiData?.data?.imageUrl &&
+  data.imagePreview?.startsWith('blob:')
+) {
+  URL.revokeObjectURL(data.imagePreview);
+}
 
-      if (result.success) {
-        showSuccessToast(result.message || 'Changes saved successfully!');
+      
+      onSave(section);
+      refetch();
 
-        // Clean up old preview URL
-        if (data.imagePreview && data.imagePreview.startsWith('blob:')) {
-          URL.revokeObjectURL(data.imagePreview);
-        }
-
-        // ✅ Update with real URL from backend (strip /api from URL)
-        handleInputChange("imageUrl", result.data.imageUrl);
-        handleInputChange("imagePreview", `${process.env.NEXT_PUBLIC_BACKEND_API.replace('/api', '')}${result.data.imageUrl}`);
-
-        // Clear pending file
-        setPendingFile(null);
-
-        onSave(section);
-        refetch();
-      } else {
-        showErrorToast('Failed to save changes');
-      }
     } catch (error) {
-      console.error('Save error:', error);
-      showErrorToast('Error saving changes: ' + (error.data?.message || error.message));
+      // ✅ Backend auto-updates on 409 - just show friendly message
+      showErrorToast(error.data?.message || 'Save failed');
     } finally {
       setIsSaving(false);
     }

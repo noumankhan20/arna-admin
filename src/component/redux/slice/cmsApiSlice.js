@@ -5,26 +5,36 @@ export const cmsApi = apiSlice.injectEndpoints({
     /* ---------------- ABOUT US ---------------- */
 
     getAboutUs: builder.query({
-      query: () => "/cms/about",
-      providesTags: ["AboutUs"],
-    }),
+  query: () => "/about",  // ✅ Fixed: Backend GET route
+  providesTags: ["AboutUs"],
+}),
 
-    saveAboutUs: builder.mutation({
-      query: (formData) => ({
-        url: "/cms/about",
-        method: "POST",
-        body: formData,
-      }),
-      invalidatesTags: ["AboutUs"],
-    }),
+saveAboutUs: builder.mutation({
+  query: (formData) => ({
+    url: "/about",        // ✅ Fixed: Backend POST route  
+    method: "POST",
+    body: formData,
+  }),
+  invalidatesTags: ["AboutUs"],
+}),
 
-    deleteAboutUs: builder.mutation({
-      query: () => ({
-        url: "/cms/about",
-        method: "DELETE",
-      }),
-      invalidatesTags: ["AboutUs"],
-    }),
+updateAboutUs: builder.mutation({     // ✅ NEW: Separate UPDATE
+  query: (formData) => ({
+    url: `/about/${formData.id}`,  // ✅ Fixed: Backend PUT route + ID
+    method: "PUT",
+    body: formData,
+  }),
+  invalidatesTags: ["AboutUs"],
+}),
+
+deleteAboutUs: builder.mutation({
+  query: (aboutId) => ({        // ✅ Fixed: Pass ID
+    url: `/about/${aboutId}`,
+    method: "DELETE",
+  }),
+  invalidatesTags: ["AboutUs"],
+}),
+
 
     /* ---------------- HOME HERO ---------------- */
 
