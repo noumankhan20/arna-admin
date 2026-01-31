@@ -5,42 +5,45 @@ export const cmsApi = apiSlice.injectEndpoints({
     /* ---------------- ABOUT US ---------------- */
 
     getAboutUs: builder.query({
-  query: () => "/about",  // ✅ Fixed: Backend GET route
-  providesTags: ["AboutUs"],
-}),
+      query: () => "/about",
+      providesTags: ["AboutUs"],
+    }),
 
-saveAboutUs: builder.mutation({
-  query: (formData) => ({
-    url: "/about",        // ✅ Fixed: Backend POST route  
-    method: "POST",
-    body: formData,
-  }),
-  invalidatesTags: ["AboutUs"],
-}),
+    saveAboutUs: builder.mutation({
+      query: (formData) => ({
+        url: "/about",
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: ["AboutUs"],
+    }),
 
-updateAboutUs: builder.mutation({     // ✅ NEW: Separate UPDATE
-  query: (formData) => ({
-    url: `/about/${formData.id}`,  // ✅ Fixed: Backend PUT route + ID
-    method: "PUT",
-    body: formData,
-  }),
-  invalidatesTags: ["AboutUs"],
-}),
+    updateAboutUs: builder.mutation({
+      query: (formData) => ({
+        url: `/about/${formData.id}`,
+        method: "PUT",
+        body: formData,
+      }),
+      invalidatesTags: ["AboutUs"],
+    }),
 
-deleteAboutUs: builder.mutation({
-  query: (aboutId) => ({        // ✅ Fixed: Pass ID
-    url: `/about/${aboutId}`,
-    method: "DELETE",
-  }),
-  invalidatesTags: ["AboutUs"],
-}),
+    deleteAboutUs: builder.mutation({
+      query: (aboutId) => ({
+        url: `/about/${aboutId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["AboutUs"],
+    }),
 
 
     /* ---------------- HOME HERO ---------------- */
 
     getHomeHero: builder.query({
-      query: () => "/cms/hero",
-      providesTags: ["AboutUs"],
+      query: (section) => ({
+        url: "/cms/hero",
+        params: section ? { section } : {},
+      }),
+      providesTags: ["CMS"],
     }),
 
     saveHomeHero: builder.mutation({
@@ -49,7 +52,16 @@ deleteAboutUs: builder.mutation({
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ["AboutUs"],
+      invalidatesTags: ["CMS"],
+    }),
+
+    deleteHomeHero: builder.mutation({
+      query: (section) => ({
+        url: "/cms/hero",
+        method: "DELETE",
+        params: { section },
+      }),
+      invalidatesTags: ["CMS"],
     }),
   }),
 });
@@ -60,4 +72,5 @@ export const {
   useDeleteAboutUsMutation,
   useGetHomeHeroQuery,
   useSaveHomeHeroMutation,
+  useDeleteHomeHeroMutation,
 } = cmsApi;

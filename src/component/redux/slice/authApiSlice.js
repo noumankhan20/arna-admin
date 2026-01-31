@@ -18,7 +18,7 @@ export const authApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Admin"],
     }),
 
-    getAdmin: builder.query({
+    getAdminProfile: builder.query({
       query: () => "/admin/me",
       providesTags: ["Admin"],
     }),
@@ -28,5 +28,5 @@ export const authApi = apiSlice.injectEndpoints({
 export const {
   useLoginAdminMutation,
   useLogoutAdminMutation,
-  useGetAdminQuery,
+  useGetAdminProfileQuery,
 } = authApi;

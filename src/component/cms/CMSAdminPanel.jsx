@@ -46,9 +46,8 @@ export default function CMSAdminPanel() {
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 flex overflow-hidden">
       {/* Fixed Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl transform transition-all duration-500 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl transform transition-all duration-500 ease-in-out lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <div className="h-full flex flex-col overflow-hidden">
           {/* Logo header */}
@@ -85,16 +84,14 @@ export default function CMSAdminPanel() {
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id)}
-                    className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex-shrink-0 ${
-                      isActive
-                        ? "bg-white text-emerald-700 shadow-xl scale-[1.02] translate-x-1"
-                        : "text-emerald-50 hover:text-white hover:bg-white/15 hover:translate-x-1"
-                    }`}
+                    className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex-shrink-0 ${isActive
+                      ? "bg-white text-emerald-700 shadow-xl scale-[1.02] translate-x-1"
+                      : "text-emerald-50 hover:text-white hover:bg-white/15 hover:translate-x-1"
+                      }`}
                   >
                     <item.icon
-                      className={`w-5 h-5 flex-shrink-0 transition-all duration-300 ${
-                        isActive ? "text-emerald-600 scale-110" : "text-emerald-100 group-hover:text-white group-hover:scale-110"
-                      }`}
+                      className={`w-5 h-5 flex-shrink-0 transition-all duration-300 ${isActive ? "text-emerald-600 scale-110" : "text-emerald-100 group-hover:text-white group-hover:scale-110"
+                        }`}
                     />
                     <span className="text-left">{item.label}</span>
                     {isActive && (
@@ -146,7 +143,7 @@ export default function CMSAdminPanel() {
             {activeSection === 'home-hero' && (
               <ContentSection
                 title="Home Hero Section"
-                data={cmsData["home-hero"]}
+                data={cmsData}
                 section="home-hero"
                 setCmsData={setCmsData}
                 onSave={handleSave}
@@ -156,7 +153,7 @@ export default function CMSAdminPanel() {
             {activeSection === 'about-hero' && (
               <ContentSection
                 title="About Hero Section"
-                data={cmsData["about-hero"]}
+                data={cmsData}
                 section="about-hero"
                 setCmsData={setCmsData}
                 onSave={handleSave}

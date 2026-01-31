@@ -2,12 +2,12 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { LayoutDashboard, FileEdit, ChevronRight, LogOut } from 'lucide-react';
-import { useLogoutAdminMutation, useGetAdminQuery } from '../redux/slice/authApiSlice';
+import { useLogoutAdminMutation, useGetAdminProfileQuery } from '../redux/slice/authApiSlice';
 import { toast } from 'react-toastify';
 export default function SelectPortal() {
   const router = useRouter();
   const [logoutAdmin, { isLoading: isLoggingOut }] = useLogoutAdminMutation();
-  const { isLoading, isError } = useGetAdminQuery(undefined, {
+  const { isLoading, isError } = useGetAdminProfileQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
 
