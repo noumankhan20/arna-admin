@@ -73,10 +73,10 @@ const Sidebar = () => {
                         />
                     </div>
                     <div>
-                        <p className="text-xl font-black text-gray-900 italic tracking-tight leading-tight">
+                        <p className="text-xl font-bold text-gray-900 italic tracking-tight leading-tight">
                             Main <span className="text-emerald-600">Admin</span>
                         </p>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mt-0.5">
+                        <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-[0.2em] mt-0.5">
                             Arna Operations
                         </p>
                     </div>
@@ -111,7 +111,7 @@ const Sidebar = () => {
                 })}
             </nav>
 
-         
+
         </div>
     );
 };

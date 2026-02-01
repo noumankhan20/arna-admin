@@ -224,8 +224,8 @@ export default function ContentSection({
                 <Layers className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <h4 className="font-bold text-gray-900 leading-tight">Home Carousel</h4>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">Manage All Banners</p>
+                <h4 className="font-semibold text-gray-900 leading-tight">Home Carousel</h4>
+                <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest mt-0.5">Manage All Banners</p>
               </div>
             </div>
 
@@ -234,7 +234,7 @@ export default function ContentSection({
                 <div key={slide.section} className="relative group/item">
                   <button
                     onClick={() => setSelectedSlideId(slide.section)}
-                    className={`px-5 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-3 ${selectedSlideId === slide.section
+                    className={`px-5 py-3 rounded-xl text-sm font-semibold transition-all flex items-center gap-3 ${selectedSlideId === slide.section
                       ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100 scale-105"
                       : "bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-100"
                       }`}
@@ -275,11 +275,11 @@ export default function ContentSection({
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+                  <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
                     {isAddingNew ? "New Slide Wizard" : (isHomeHero ? "Slide Master Editor" : title)}
                   </h3>
                   {isAddingNew && (
-                    <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-black uppercase tracking-widest">Awaiting Content</span>
+                    <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Awaiting Content</span>
                   )}
                 </div>
                 <p className="text-sm text-gray-400 font-medium tracking-tight">
@@ -300,7 +300,7 @@ export default function ContentSection({
           <div className="p-10 space-y-10">
             {/* Image Upload Area */}
             <div className="space-y-4">
-              <label className="flex items-center gap-2 text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">
+              <label className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
                 <Layout className="w-4 h-4 text-emerald-500" />
                 Visual Asset
               </label>
@@ -324,13 +324,13 @@ export default function ContentSection({
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-4">
                       <button
                         onClick={() => document.getElementById("image-upload").click()}
-                        className="bg-white text-gray-900 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-50 hover:text-emerald-700 transition-all shadow-2xl scale-95 group-hover:scale-100"
+                        className="bg-white text-gray-900 px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-50 hover:text-emerald-700 transition-all shadow-2xl scale-95 group-hover:scale-100"
                       >
                         Swap Image
                       </button>
                       <button
                         onClick={() => setEditForm(p => ({ ...p, imagePreview: '', imageUrl: '' }))}
-                        className="bg-red-500 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-600 transition-all shadow-2xl scale-95 group-hover:scale-100"
+                        className="bg-red-500 text-white px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-red-600 transition-all shadow-2xl scale-95 group-hover:scale-100"
                       >
                         Remove
                       </button>
@@ -345,8 +345,8 @@ export default function ContentSection({
                       <div className="w-20 h-20 bg-emerald-100 rounded-[2rem] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl shadow-emerald-100">
                         <Upload className="w-10 h-10 text-emerald-600" />
                       </div>
-                      <p className="text-lg font-black text-emerald-700 tracking-tight">Drop Hero Visual Here</p>
-                      <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-2">Support: 4K JPG, PNG, WEBP (Max 5MB)</p>
+                      <p className="text-lg font-bold text-emerald-700 tracking-tight">Drop Hero Visual Here</p>
+                      <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest mt-2">Support: 4K JPG, PNG, WEBP (Max 5MB)</p>
                     </div>
                   </label>
                 )}
@@ -356,19 +356,19 @@ export default function ContentSection({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               {/* Title */}
               <div className="space-y-4">
-                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Primary Heading</label>
+                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">Primary Heading</label>
                 <input
                   type="text"
                   value={editForm.title}
                   onChange={(e) => handleInputChange("title", e.target.value)}
                   placeholder="e.g. Honest Skincare You Can Trust"
-                  className="w-full px-6 py-5 bg-gray-50 border-2 border-gray-50 rounded-[1.5rem] text-lg text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/30 transition-all font-black"
+                  className="w-full px-6 py-5 bg-gray-50 border-2 border-gray-50 rounded-[1.5rem] text-lg text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/30 transition-all font-bold"
                 />
               </div>
 
               {/* Subtext */}
               <div className="space-y-4">
-                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Secondary Text</label>
+                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">Secondary Text</label>
                 <textarea
                   value={editForm.description}
                   onChange={(e) => handleInputChange("description", e.target.value)}
@@ -383,7 +383,7 @@ export default function ContentSection({
           <div className="px-10 py-8 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className={`w-2.5 h-2.5 rounded-full ${pendingFile || isAddingNew ? 'bg-amber-400 animate-pulse' : 'bg-emerald-500'}`} />
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                 {pendingFile ? 'Local Changes Staged' : (isAddingNew ? 'New Entry Pending' : 'Cloud Copy Synced')}
               </p>
             </div>
@@ -392,7 +392,7 @@ export default function ContentSection({
               {isAddingNew && (
                 <button
                   onClick={() => setIsAddingNew(false)}
-                  className="text-gray-400 font-bold text-xs uppercase tracking-widest hover:text-gray-600 transition-colors"
+                  className="text-gray-400 font-semibold text-xs uppercase tracking-widest hover:text-gray-600 transition-colors"
                 >
                   Cancel
                 </button>
@@ -400,7 +400,7 @@ export default function ContentSection({
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex items-center gap-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-10 py-4.5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-emerald-100 hover:shadow-emerald-200 hover:-translate-y-1 active:translate-y-0 transition-all disabled:opacity-50"
+                className="flex items-center gap-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-10 py-4.5 rounded-2xl font-bold text-xs uppercase tracking-[0.2em] shadow-xl shadow-emerald-100 hover:shadow-emerald-200 hover:-translate-y-1 active:translate-y-0 transition-all disabled:opacity-50"
               >
                 {isSaving ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -418,7 +418,7 @@ export default function ContentSection({
         <div className="fixed bottom-12 right-12 z-[100] animate-in slide-in-from-right-10 duration-300">
           <div className={`${toastType === "success" ? "bg-emerald-600" : "bg-red-600"} text-white px-10 py-5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-4 border border-white/10 backdrop-blur-md`}>
             {toastType === "success" ? <CheckCircle2 className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
-            <span className="font-black text-xs uppercase tracking-widest">{toastMessage}</span>
+            <span className="font-bold text-xs uppercase tracking-widest">{toastMessage}</span>
           </div>
         </div>
       )}

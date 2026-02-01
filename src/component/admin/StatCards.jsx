@@ -22,7 +22,7 @@ const StatCard = ({ title, value, icon: Icon, trend, subtitle, loading }) => (
                 </div>
                 {!loading && trend && (
                     <div className="flex flex-col items-end">
-                        <span className={`flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-lg ${trend.startsWith('+') ? 'text-emerald-600 bg-emerald-50' : 'text-red-600 bg-red-50'
+                        <span className={`flex items-center gap-0.5 text-xs font-semibold px-2 py-1 rounded-lg ${trend.startsWith('+') ? 'text-emerald-600 bg-emerald-50' : 'text-red-600 bg-red-50'
                             }`}>
                             {trend}
                         </span>
@@ -31,12 +31,12 @@ const StatCard = ({ title, value, icon: Icon, trend, subtitle, loading }) => (
             </div>
 
             <div>
-                <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1">{title}</p>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mb-1">{title}</p>
                 <div className="flex items-baseline gap-2">
                     {loading ? (
                         <div className="h-8 w-24 bg-gray-100 animate-pulse rounded-lg" />
                     ) : (
-                        <h3 className="text-3xl font-black text-gray-900 tracking-tight">{value}</h3>
+                        <h3 className="text-3xl font-bold text-gray-900 tracking-tight">{value}</h3>
                     )}
                 </div>
                 <p className="text-xs text-gray-400 mt-2 font-medium">{subtitle}</p>
