@@ -41,7 +41,7 @@ export default function PromoFormModal({ isOpen, onClose, onSubmit, editPromo, i
                 influencerCodeOwner: editPromo.influencer?.codeOwner || '',
                 startDate: editPromo.startDate ? editPromo.startDate.split('T')[0] : '',
                 endDate: editPromo.endDate ? editPromo.endDate.split('T')[0] : '',
-                showAsPopup: editPromo.showAsPopup || false,
+                showAsPopup: Boolean(editPromo.showAsPopup),
             });
         } else {
             resetForm();

@@ -6,6 +6,6 @@ export const apiSlice = createApi({
     baseUrl: process.env.NEXT_PUBLIC_BACKEND_API,
     credentials: "include",
   }),
-  tagTypes: ["Admin", "Products", "AboutUs", "Promo"],
+  tagTypes: ["Admin", "Products", "AboutUs", "Promo","CMS"],
   endpoints: () => ({}),
 });

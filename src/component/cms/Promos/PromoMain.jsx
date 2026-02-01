@@ -63,7 +63,7 @@ export default function PromosPage() {
       if (editPromo) {
         await updatePromo({
           id: editPromo._id,
-          body: formData, // 👈 IMPORTANT
+          formData, // 👈 IMPORTANT
         }).unwrap();
       } else {
         await createPromo(formData).unwrap();

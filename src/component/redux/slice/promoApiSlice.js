@@ -64,10 +64,10 @@ export const promoApiSlice = apiSlice.injectEndpoints({
     // PUT /api/promos/:id/update
     // ---------------------------
     updatePromo: builder.mutation({
-      query: ({ id, ...data }) => ({
+      query: ({ id, formData }) => ({
         url: `/promos/${id}/update`,
         method: "PUT",
-        body: data,
+        body: formData,
       }),
       invalidatesTags: (result, error, { id }) => [
         { type: "Promo", id },
