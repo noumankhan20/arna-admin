@@ -63,15 +63,14 @@ const Sidebar = () => {
             {/* Logo Section */}
             <div className="px-6 py-6 border-b border-gray-50 flex-shrink-0">
                 <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 relative flex-shrink-0 bg-emerald-50 rounded-2xl p-2 flex items-center justify-center">
-                        <Image
-                            src="/arna-logo.webp"
-                            alt="Arna Logo"
-                            width={50}
-                            height={50}
-                            className="object-contain"
-                        />
-                    </div>
+                  <div className="w-20 h-20 relative flex-shrink-0">
+                                   <Image
+                                     src="/arna-logo.webp"
+                                     alt="Arna Logo"
+                                     fill
+                                     className="object-contain"
+                                   />
+                                 </div>
                     <div>
                         <p className="text-xl font-bold text-gray-900 italic tracking-tight leading-tight">
                             Main <span className="text-emerald-600">Admin</span>
