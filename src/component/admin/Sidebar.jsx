@@ -9,7 +9,9 @@ import {
     BarChart3,
     LogOut,
     ArrowLeft,
-    ChevronRight
+    ChevronRight,
+    Ticket,
+    TicketCheck
 } from 'lucide-react';
 import { useLogoutAdminMutation } from '../redux/slice/authApiSlice';
 import { toast } from 'react-toastify';
@@ -44,6 +46,11 @@ const Sidebar = () => {
             name: 'Analysis',
             icon: BarChart3,
             path: '/admin/analysis'
+        },
+        {
+            name: 'Tickets & Queries ',
+            icon: TicketCheck,
+            path: '/admin/tickets-queries'
         },
     ];
 
