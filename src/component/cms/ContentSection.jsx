@@ -407,7 +407,7 @@ export default function ContentSection({
                 ) : (
                   <Save className="w-5 h-5" />
                 )}
-                {isAddingNew ? "Deploy New Slide" : "Commit Changes"}
+                {isAddingNew ? "Deploy New Slide" : "Save Changes"}
               </button>
             </div>
           </div>
