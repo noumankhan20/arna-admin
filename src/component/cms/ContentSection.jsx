@@ -50,7 +50,8 @@ export default function ContentSection({
     title: '',
     description: '',
     imagePreview: '',
-    imageUrl: ''
+    imageUrl: '',
+    mediaType: 'image'
   });
 
   useEffect(() => {
@@ -68,6 +69,7 @@ export default function ContentSection({
           title: d.title || '',
           description: d.description || '',
           imageUrl: d.imageUrl || '',
+          mediaType: d.mediaType || 'image',
           imagePreview: d.imageUrl
             ? (d.imageUrl.startsWith('http') ? d.imageUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL}${d.imageUrl}`)
             : ''
@@ -85,6 +87,7 @@ export default function ContentSection({
           title: slide.title || '',
           description: slide.description || '',
           imageUrl: slide.imageUrl || '',
+          mediaType: slide.mediaType || 'image',
           imagePreview: slide.imageUrl
             ? (slide.imageUrl.startsWith('http') ? slide.imageUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL}${slide.imageUrl}`)
             : ''
@@ -116,19 +119,26 @@ export default function ContentSection({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      showErrorToast('Please select a valid image file');
+    const isVideo = file.type.startsWith('video/');
+    const isImage = file.type.startsWith('image/');
+
+    if (!isImage && !isVideo) {
+      showErrorToast('Please select a valid image or video file');
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      showErrorToast('File size must be less than 5MB');
+    if (file.size > (isVideo ? 50 : 5) * 1024 * 1024) {
+      showErrorToast(`File size must be less than ${isVideo ? '50MB' : '5MB'}`);
       return;
     }
 
     setPendingFile(file);
     const previewUrl = URL.createObjectURL(file);
-    handleInputChange("imagePreview", previewUrl);
+    setEditForm(prev => ({
+      ...prev,
+      imagePreview: previewUrl,
+      mediaType: isVideo ? 'video' : 'image'
+    }));
   };
 
   const handleSave = async () => {
@@ -158,6 +168,7 @@ export default function ContentSection({
 
       if (pendingFile) {
         formData.append("image", pendingFile);
+        formData.append("mediaType", editForm.mediaType);
       }
 
       const res = await saveData(formData).unwrap();
@@ -200,7 +211,8 @@ export default function ContentSection({
       title: '',
       description: '',
       imagePreview: '',
-      imageUrl: ''
+      imageUrl: '',
+      mediaType: 'image'
     });
   };
 
@@ -239,11 +251,17 @@ export default function ContentSection({
                       : "bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-100"
                       }`}
                   >
-                    <img
-                      src={slide.imageUrl.startsWith('http') ? slide.imageUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL}${slide.imageUrl}`}
-                      alt=""
-                      className="rounded-md object-cover w-5 h-5"
-                    />
+                    {slide.mediaType === 'video' ? (
+                      <div className="w-5 h-5 rounded-md bg-gray-200 flex items-center justify-center">
+                        <Upload className="w-3 h-3 text-gray-500" />
+                      </div>
+                    ) : (
+                      <img
+                        src={slide.imageUrl.startsWith('http') ? slide.imageUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL}${slide.imageUrl}`}
+                        alt=""
+                        className="rounded-md object-cover w-5 h-5"
+                      />
+                    )}
                     Banner {index + 1}
                   </button>
                   <button
@@ -257,13 +275,16 @@ export default function ContentSection({
 
               <button
                 onClick={startAddingNew}
+                disabled={apiData?.data?.length >= 4}
                 className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${isAddingNew
                   ? "bg-emerald-100 text-emerald-600 border-2 border-emerald-500"
-                  : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-2 border-dashed border-emerald-200"
+                  : apiData?.data?.length >= 4
+                    ? "bg-gray-50 text-gray-300 border-2 border-dashed border-gray-200 cursor-not-allowed"
+                    : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-2 border-dashed border-emerald-200"
                   }`}
-                title="Add New Slide"
+                title={apiData?.data?.length >= 4 ? "Maximum 4 slides allowed" : "Add New Slide"}
               >
-                <Plus className="w-6 h-6" />
+                <Plus className={`w-6 h-6 ${apiData?.data?.length >= 4 ? 'opacity-50' : ''}`} />
               </button>
             </div>
           </div>
@@ -309,18 +330,26 @@ export default function ContentSection({
                 <input
                   type="file"
                   id="image-upload"
-                  accept="image/*"
+                  accept="image/*,video/*"
                   onChange={handleFileSelect}
                   className="hidden"
                 />
 
                 {editForm.imagePreview ? (
                   <div className="group relative overflow-hidden rounded-[2rem] border-4 border-gray-50 shadow-inner max-h-[400px]">
-                    <img
-                      src={editForm.imagePreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                    />
+                    {editForm.mediaType === 'video' ? (
+                      <video
+                        src={editForm.imagePreview}
+                        className="w-full h-full object-cover"
+                        controls
+                      />
+                    ) : (
+                      <img
+                        src={editForm.imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                      />
+                    )}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-4">
                       <button
                         onClick={() => document.getElementById("image-upload").click()}
@@ -346,7 +375,7 @@ export default function ContentSection({
                         <Upload className="w-10 h-10 text-emerald-600" />
                       </div>
                       <p className="text-lg font-bold text-emerald-700 tracking-tight">Drop Hero Visual Here</p>
-                      <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest mt-2">Support: 4K JPG, PNG, WEBP (Max 5MB)</p>
+                      <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest mt-2">Support: JPG, PNG, WEBP, MP4, WEBM (Max 50MB for video)</p>
                     </div>
                   </label>
                 )}
@@ -407,7 +436,7 @@ export default function ContentSection({
                 ) : (
                   <Save className="w-5 h-5" />
                 )}
-                {isAddingNew ? "Deploy New Slide" : "Save Changes"}
+                {isAddingNew ? "Upload New Slide" : "Save Changes"}
               </button>
             </div>
           </div>
