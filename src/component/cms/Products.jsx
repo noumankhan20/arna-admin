@@ -23,7 +23,7 @@ export default function ProductsSection({ showSuccessToast }) {
 
   const handleAddProduct = () => {
     setEditingProduct({
-      id: null,
+      _id: null,
       image: null,
       imagePreview: null,
       imageFile: null,
@@ -33,6 +33,7 @@ export default function ProductsSection({ showSuccessToast }) {
       category: '',
       price: '',
       salePrice: '',
+      link: '',
       isBestSeller: false,
       isNewArrival: false,
     });
@@ -42,6 +43,7 @@ export default function ProductsSection({ showSuccessToast }) {
   const handleEditProduct = (product) => {
     setEditingProduct({
       ...product,
+      link: product.link || '',
       category: product.category || '',
       imagePreview: product.image ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${product.image}` : null,
       imageFile: null,
@@ -93,13 +95,19 @@ export default function ProductsSection({ showSuccessToast }) {
         formData.append('salePrice', editingProduct.salePrice);
       }
 
-      formData.append('isBestSeller', editingProduct.isBestSeller);
-      formData.append('isNewArrival', editingProduct.isNewArrival);
+      formData.append('isBestSeller', editingProduct.isBestSeller ? 'true' : 'false');
+      formData.append('isNewArrival', editingProduct.isNewArrival ? 'true' : 'false');
+
 
       // Only append image if a new file was selected
       if (editingProduct.imageFile) {
         formData.append('image', editingProduct.imageFile);
       }
+
+      if (editingProduct.link) {
+        formData.append('link', editingProduct.link);
+      }
+
 
       let result;
       if (editingProduct._id) {
@@ -340,6 +348,26 @@ export default function ProductsSection({ showSuccessToast }) {
               />
             </div>
 
+
+            {/* Product Usage link */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900">
+                Youtube Tutorial Video Link
+              </label>
+              <input
+                type="text"
+                value={editingProduct.link}
+                onChange={(e) =>
+                  setEditingProduct(prev => ({
+                    ...prev,
+                    link: e.target.value
+                  }))
+                }
+                placeholder="Enter youtube video link"
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              />
+            </div>
+
             {/* Badges */}
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-900">Product Badges</label>
@@ -466,7 +494,7 @@ export default function ProductsSection({ showSuccessToast }) {
                   </button>
                 </div>
               </div>
-              
+
               <div className="p-5 flex flex-col flex-grow">
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="flex-1 min-w-0">
@@ -481,7 +509,7 @@ export default function ProductsSection({ showSuccessToast }) {
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-                
+
                 <div className="mt-auto pt-4 border-t border-gray-200 flex items-center gap-2">
                   {product.salePrice ? (
                     <>
