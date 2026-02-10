@@ -31,6 +31,8 @@ export default function ProductsSection({ showSuccessToast }) {
       slug: '',
       description: '',
       category: '',
+      quantity: '',
+      unit: 'g',
       price: '',
       salePrice: '',
       link: '',
@@ -43,6 +45,8 @@ export default function ProductsSection({ showSuccessToast }) {
   const handleEditProduct = (product) => {
     setEditingProduct({
       ...product,
+      quantity: product.quantity || '',
+      unit: product.unit || 'g',
       link: product.link || '',
       category: product.category || '',
       imagePreview: product.image ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${product.image}` : null,
@@ -72,7 +76,9 @@ export default function ProductsSection({ showSuccessToast }) {
   };
 
   const handleSaveProduct = async () => {
-    if (!editingProduct.name || !editingProduct.description || !editingProduct.price || !editingProduct.category) {
+    if (!editingProduct.name || !editingProduct.description || !editingProduct.price || !editingProduct.category
+      || !editingProduct.quantity || !editingProduct.unit
+    ) {
       showSuccessToast('Please fill in all required fields!', 'error');
       return;
     }
@@ -90,6 +96,8 @@ export default function ProductsSection({ showSuccessToast }) {
       formData.append('description', editingProduct.description);
       formData.append('price', editingProduct.price);
       formData.append('category', editingProduct.category);
+      formData.append('quantity', Number(editingProduct.quantity));
+      formData.append('unit', editingProduct.unit);
 
       if (editingProduct.salePrice) {
         formData.append('salePrice', editingProduct.salePrice);
@@ -306,6 +314,49 @@ export default function ProductsSection({ showSuccessToast }) {
               </select>
             </div>
 
+            {/* Quantity & Unit */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-900">
+                  Quantity <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={editingProduct.quantity}
+                  onChange={(e) =>
+                    setEditingProduct(prev => ({
+                      ...prev,
+                      quantity: e.target.value
+                    }))
+                  }
+                  placeholder="e.g. 100"
+                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-900">
+                  Unit <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={editingProduct.unit}
+                  onChange={(e) =>
+                    setEditingProduct(prev => ({
+                      ...prev,
+                      unit: e.target.value
+                    }))
+                  }
+                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                >
+                  <option value="g">Grams (g)</option>
+                  <option value="ml">Milliliters (ml)</option>
+                  <option value="pcs">Pieces (pcs)</option>
+                </select>
+              </div>
+            </div>
+
+
             {/* Price & Sale Price */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -509,6 +560,9 @@ export default function ProductsSection({ showSuccessToast }) {
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
+                <p className="text-sm text-gray-600 mb-1">
+                  {product.quantity} {product.unit}
+                </p>
 
                 <div className="mt-auto pt-4 border-t border-gray-200 flex items-center gap-2">
                   {product.salePrice ? (
