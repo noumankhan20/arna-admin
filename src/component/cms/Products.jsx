@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Save, Trash2, Plus, Edit, X, Image as ImageIcon, Upload } from "lucide-react";
 import {
   useCreateProductMutation,
@@ -11,15 +11,31 @@ import { PRODUCT_CATEGORIES } from "../constants/product.constants";
 
 export default function ProductsSection({ showSuccessToast }) {
   const [showForm, setShowForm] = useState(false);
+  const [search, setSearch] = useState("");
   const [editingProduct, setEditingProduct] = useState(null);
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 100,
+    category: "",
+    isBestSeller: "",
+    isNewArrival: "",
+  });
 
   // RTK Query hooks
-  const { data: productsData, isLoading, error } = useGetAllProductsQuery();
+  const { data: productsData, isLoading, error } = useGetAllProductsQuery(filters);
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
-
   const products = productsData?.data || [];
+
+  const filteredProducts = useMemo(() => {
+    if (!search.trim()) return products;
+
+    return products.filter((product) =>
+      product.name.toLowerCase().includes(search.toLowerCase()) ||
+      product.description?.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [products, search]);
 
   const handleAddProduct = () => {
     setEditingProduct({
@@ -352,6 +368,7 @@ export default function ProductsSection({ showSuccessToast }) {
                   <option value="g">Grams (g)</option>
                   <option value="ml">Milliliters (ml)</option>
                   <option value="pcs">Pieces (pcs)</option>
+                  <option value="ltr">Liters (ltr)</option>
                 </select>
               </div>
             </div>
@@ -494,15 +511,116 @@ export default function ProductsSection({ showSuccessToast }) {
         </button>
       </div>
 
+      {/* Filters */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div className="flex flex-col gap-4">
+          {/* Search Bar - Full Width */}
+          <div className="relative">
+            <svg
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
+            />
+          </div>
+
+          {/* Filters Row */}
+          <div className="flex flex-wrap gap-3">
+            {/* Category Filter */}
+            <div className="flex-1 min-w-[200px]">
+              <select
+                value={filters.category}
+                onChange={(e) =>
+                  setFilters(prev => ({
+                    ...prev,
+                    category: e.target.value,
+                    page: 1
+                  }))
+                }
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all cursor-pointer text-gray-700"
+              >
+                <option value="">All Categories</option>
+                {PRODUCT_CATEGORIES.map(cat => (
+                  <option key={cat} value={cat}>
+                    {cat.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Best Seller Filter */}
+            <div className="flex-1 min-w-[180px]">
+              <select
+                value={filters.isBestSeller}
+                onChange={(e) =>
+                  setFilters(prev => ({
+                    ...prev,
+                    isBestSeller: e.target.value,
+                    page: 1
+                  }))
+                }
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all cursor-pointer text-gray-700"
+              >
+                <option value="">All Products</option>
+                <option value="true"> Best Sellers</option>
+              </select>
+            </div>
+
+            {/* New Arrival Filter */}
+            <div className="flex-1 min-w-[180px]">
+              <select
+                value={filters.isNewArrival}
+                onChange={(e) =>
+                  setFilters(prev => ({
+                    ...prev,
+                    isNewArrival: e.target.value,
+                    page: 1
+                  }))
+                }
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all cursor-pointer text-gray-700"
+              >
+                <option value="">All Products</option>
+                <option value="true"> New Arrivals</option>
+              </select>
+            </div>
+
+            {/* Reset Button */}
+            <button
+              onClick={() => {
+                setSearch("");
+                setFilters({
+                  page: 1,
+                  limit: 100,
+                  category: "",
+                  isBestSeller: "",
+                  isNewArrival: "",
+                })
+              }}
+              className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 active:scale-95 transition-all duration-150 whitespace-nowrap"
+            >
+              Clear All
+            </button>
+          </div>
+        </div>
+      </div>
       {/* Products Grid */}
-      {products.length === 0 ? (
+      {filteredProducts.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-2xl border border-gray-200">
           <ImageIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">No products yet. Add your first product!</p>
+          <p className="text-gray-500">No products found matching your criteria.</p>
         </div>
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map(product => (
+          {filteredProducts.map(product => (
             <div
               key={product._id}
               className="group bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300 flex flex-col h-full"
