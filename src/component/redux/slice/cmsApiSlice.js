@@ -63,6 +63,20 @@ export const cmsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["CMS"],
     }),
+
+    getOurStory: builder.query({
+      query: () => "/our-story/get",
+      providesTags: ["OurStory"],
+    }),
+
+    updateOurStory: builder.mutation({
+      query: (data) => ({
+        url: "/our-story/update",
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["OurStory"],
+    }),
   }),
 });
 
@@ -73,4 +87,6 @@ export const {
   useGetHomeHeroQuery,
   useSaveHomeHeroMutation,
   useDeleteHomeHeroMutation,
+  useGetOurStoryQuery,
+  useUpdateOurStoryMutation,
 } = cmsApi;

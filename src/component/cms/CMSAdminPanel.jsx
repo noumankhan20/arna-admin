@@ -2,22 +2,24 @@
 import { useState } from 'react';
 import {
   Home, Info, Star, FileText, Package,
-  Menu, X, CheckCircle2
+  Menu, X, CheckCircle2,
+  ArrowLeft
 } from 'lucide-react';
 import { initialCMSData } from './initialCMSData';
 import { sidebarItems } from './CMSSidebar';
 import ContentSection from './ContentSection';
 import ProductsSection from './Products';
 import PromoMain from "./Promos/PromoMain"; // Your existing import
+import OurStorySection from "./OurStory"
 import Image from 'next/image';
-
+import { useRouter } from 'next/navigation';
 export default function CMSAdminPanel() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeSection, setActiveSection] = useState('home-hero');
   const [cmsData, setCmsData] = useState(initialCMSData);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-
+  const router = useRouter();
   const navItems = sidebarItems;
 
   const showSuccessToast = (message) => {
@@ -52,6 +54,13 @@ export default function CMSAdminPanel() {
         <div className="h-full flex flex-col overflow-hidden">
           {/* Logo header */}
           <div className="px-6 py-6 bg-white flex-shrink-0">
+            <button
+              onClick={() => router.push('/select-dashboard')}
+              className="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-400 hover:text-emerald-600 transition-colors uppercase tracking-widest group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Back to Select Dashboard
+            </button>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-20 h-20 relative flex-shrink-0">
@@ -122,6 +131,7 @@ export default function CMSAdminPanel() {
       <div className="flex-1 flex flex-col ml-0 lg:ml-80 h-screen overflow-hidden">
         <header className="bg-white px-6 lg:px-8 py-5 z-40 border-b border-gray-100 shadow-sm flex-shrink-0">
           <div className="flex items-center justify-between">
+
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(true)}
@@ -172,6 +182,10 @@ export default function CMSAdminPanel() {
             {activeSection === 'promos' && (
               <PromoMain />
             )}
+            {activeSection === 'ourstory' && (
+              <OurStorySection />
+            )}
+
           </div>
         </main>
       </div>

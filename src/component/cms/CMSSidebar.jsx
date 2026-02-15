@@ -1,4 +1,4 @@
-import { Home, Info, Star, FileText, Package, Tag } from "lucide-react";
+import { Home, Info, Star, FileText, Package, Tag, BookOpen } from "lucide-react";
 
 export const sidebarItems = [
   {
@@ -36,5 +36,11 @@ export const sidebarItems = [
     label: "Sponsor a POP Model",
     icon: Tag,
     section: "promos"
+  },
+  {
+    id: "ourstory",
+    label: "Our Story Section",
+    icon: BookOpen,
+    section: "ourstory"
   }
 ];

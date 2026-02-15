@@ -60,7 +60,7 @@ const Sidebar = () => {
             <div className="px-6 py-4">
                 <button
                     onClick={() => router.push('/select-dashboard')}
-                    className="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-emerald-600 transition-colors uppercase tracking-widest group"
+                    className="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-400 hover:text-emerald-600 transition-colors uppercase tracking-widest group"
                 >
                     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                     Back to Select Dashboard
