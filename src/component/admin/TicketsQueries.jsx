@@ -142,7 +142,7 @@ export default function TicketsAndQueries() {
                     <div className="divide-y divide-slate-200">
                         {tickets.map((ticket) => (
                             <div
-                                key={ticket.id}
+                                key={ticket._id}
                                 className="px-6 py-4 hover:bg-slate-50 transition-colors duration-150"
                             >
                                 {/* Desktop Layout */}
