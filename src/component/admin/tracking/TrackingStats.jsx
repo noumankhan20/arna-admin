@@ -9,31 +9,28 @@ const TrackingStats = ({ shipments = [] }) => {
             label: 'Total Shipments',
             icon: Package,
             color: 'bg-emerald-50 text-emerald-600',
-            trend: '+12%',
             value: shipments.length
         },
         {
             label: 'In Transit',
             icon: Truck,
             color: 'bg-blue-50 text-blue-600',
-            trend: '+5%',
-            value: shipments.filter(s => s.status === 'In Transit').length
+            value: shipments.filter(s => ['in_transit', 'out_for_delivery', 'booked', 'shipped'].includes(s.status)).length
         },
         {
             label: 'Delivered',
             icon: CheckCircle2,
             color: 'bg-teal-50 text-teal-600',
-            trend: '+18%',
-            value: shipments.filter(s => s.status === 'Delivered').length
+            value: shipments.filter(s => s.status === 'delivered').length
         },
         {
             label: 'Exceptions',
             icon: AlertCircle,
             color: 'bg-rose-50 text-rose-600',
-            trend: '-2%',
-            value: shipments.filter(s => s.status === 'Exception').length
+            value: shipments.filter(s => ['failed', 'cancelled'].includes(s.status)).length
         },
     ];
+
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -48,11 +45,6 @@ const TrackingStats = ({ shipments = [] }) => {
                         <div className="flex justify-between items-start mb-6">
                             <div className={`w-12 h-12 rounded-2xl ${stat.color} flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-inner`}>
                                 <stat.icon className="w-5 h-5" />
-                            </div>
-                            <div className="flex flex-col items-end">
-                                <span className={`flex items-center gap-0.5 text-xs font-semibold px-2.5 py-1 rounded-lg ${stat.trend.startsWith('+') ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'}`}>
-                                    {stat.trend}
-                                </span>
                             </div>
                         </div>
 
@@ -69,6 +61,7 @@ const TrackingStats = ({ shipments = [] }) => {
         </div>
     );
 };
+
 
 export default TrackingStats;
 
