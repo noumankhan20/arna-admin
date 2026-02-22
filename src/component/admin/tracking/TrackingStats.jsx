@@ -8,52 +8,48 @@ const TrackingStats = ({ shipments = [] }) => {
         {
             label: 'Total Shipments',
             icon: Package,
-            color: 'bg-emerald-50 text-emerald-600',
+            bgColor: 'bg-blue-50',
+            iconColor: 'text-blue-600',
             value: shipments.length
         },
         {
             label: 'In Transit',
             icon: Truck,
-            color: 'bg-blue-50 text-blue-600',
+            bgColor: 'bg-amber-50',
+            iconColor: 'text-amber-600',
             value: shipments.filter(s => ['in_transit', 'out_for_delivery', 'booked', 'shipped'].includes(s.status)).length
         },
         {
             label: 'Delivered',
             icon: CheckCircle2,
-            color: 'bg-teal-50 text-teal-600',
+            bgColor: 'bg-emerald-50',
+            iconColor: 'text-emerald-600',
             value: shipments.filter(s => s.status === 'delivered').length
         },
         {
             label: 'Exceptions',
             icon: AlertCircle,
-            color: 'bg-rose-50 text-rose-600',
+            bgColor: 'bg-rose-50',
+            iconColor: 'text-rose-600',
             value: shipments.filter(s => ['failed', 'cancelled'].includes(s.status)).length
         },
     ];
 
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((stat, index) => (
                 <div
                     key={index}
-                    className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-500 group relative overflow-hidden"
+                    className="bg-white rounded-xl p-5 shadow-sm border border-slate-200"
                 >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50/50 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-emerald-100/50 transition-colors duration-500" />
-
-                    <div className="relative z-10">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className={`w-12 h-12 rounded-2xl ${stat.color} flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-inner`}>
-                                <stat.icon className="w-5 h-5" />
-                            </div>
-                        </div>
-
+                    <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mb-1">{stat.label}</p>
-                            <h3 className="text-3xl font-black text-gray-900 tracking-tight group-hover:text-emerald-600 transition-colors duration-300">
-                                {stat.value}
-                            </h3>
-                            <p className="text-xs text-gray-400 mt-2 font-medium">Updated live</p>
+                            <p className="text-sm font-medium text-slate-600">{stat.label}</p>
+                            <p className="text-2xl font-bold text-slate-800 mt-1">{stat.value}</p>
+                        </div>
+                        <div className={`p-3 ${stat.bgColor} rounded-lg`}>
+                            <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
                         </div>
                     </div>
                 </div>
