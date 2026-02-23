@@ -142,10 +142,6 @@ export default function ContentSection({
   };
 
   const handleSave = async () => {
-    if (!editForm.title?.trim() || !editForm.description?.trim()) {
-      showErrorToast('Title and description are required');
-      return;
-    }
 
     if (isAddingNew && !pendingFile) {
       showErrorToast('Image is required for new slides');
