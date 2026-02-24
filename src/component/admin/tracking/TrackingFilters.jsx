@@ -14,7 +14,7 @@ const TrackingFilters = ({ search, setSearch, filters, setFilters }) => {
         setSearch('');
         setFilters({
             page: 1,
-            limit: 100,
+            limit: 10,
             shipmentStatus: '',
             status: '',
             paymentStatus: ''

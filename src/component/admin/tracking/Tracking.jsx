@@ -14,13 +14,17 @@ const Tracking = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filters, setFilters] = useState({
         page: 1,
-        limit: 100,
+        limit: 10,
         shipmentStatus: '',
         status: '',
         paymentStatus: '',
     });
 
-    const { data: ordersData, isLoading, error } = useGetAllOrdersQuery(filters);
+    const { data: ordersData, isLoading, isFetching, error } = useGetAllOrdersQuery(filters);
+
+    const handlePageChange = (newPage) => {
+        setFilters(prev => ({ ...prev, page: newPage }));
+    };
 
     // ✅ Using data from getAllOrders directly
     const orders = ordersData?.data || ordersData?.orders || [];
@@ -115,7 +119,11 @@ const Tracking = () => {
                 />
                 <TrackingTable
                     shipments={filteredShipments}
-                    totalCount={ordersData?.pagination?.totalRecords || shipments.length}
+                    totalCount={ordersData?.pagination?.totalRecords || ordersData?.total || shipments.length}
+                    page={filters.page}
+                    limit={filters.limit}
+                    onPageChange={handlePageChange}
+                    isFetching={isFetching}
                     onViewMore={handleViewMore}
                 />
             </div>

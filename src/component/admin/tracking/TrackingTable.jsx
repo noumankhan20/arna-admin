@@ -3,22 +3,31 @@
 import { MapPin, Calendar, Eye, Package, Search, CreditCard, ClipboardCheck, ArrowRight } from 'lucide-react';
 import { getStatusStyle, formatStatus } from './statusUtils';
 
-const TrackingTable = ({ shipments = [], totalCount = 0, onViewMore }) => {
+const TrackingTable = ({ shipments = [], totalCount = 0, page = 1, limit = 10, onPageChange, isFetching, onViewMore }) => {
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h3 className="text-lg font-bold text-slate-800">Shipment Log</h3>
-                    <p className="text-slate-500 text-xs mt-1">Found {shipments.length} matching entries</p>
+                    <p className="text-slate-500 text-xs mt-1">Found {totalCount} total entries</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="px-3 py-1 bg-emerald-50 rounded-full text-xs font-medium text-emerald-700 border border-emerald-200">
-                        {shipments.length} Results
+                        Page {page} of {totalPages || 1}
                     </div>
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto relative">
+                {isFetching && (
+                    <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10 transition-all">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" />
+                    </div>
+                )}
                 <table className="w-full text-left">
                     <thead>
                         <tr className="bg-slate-50 border-b border-slate-200 text-sm font-semibold text-slate-700">
@@ -108,12 +117,30 @@ const TrackingTable = ({ shipments = [], totalCount = 0, onViewMore }) => {
             </div>
 
             <div className="p-6 bg-slate-50/50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p className="text-sm text-slate-600">
-                    Showing <span className="text-slate-800 font-bold">{shipments.length}</span> of {totalCount} total shipments
+                <p className="text-sm text-slate-600 font-medium">
+                    Showing <span className="text-slate-800 font-bold">{Math.min(shipments.length, limit)}</span> results on page <span className="text-slate-800 font-bold">{page}</span> of <span className="text-slate-800 font-bold">{totalCount}</span> total shipments
                 </p>
-                <div className="flex items-center gap-2">
-                    <button className="px-4 py-2 text-sm font-medium text-slate-400 cursor-not-allowed bg-white border border-slate-200 rounded-lg">Previous</button>
-                    <button className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all shadow-sm active:scale-95">Next Segment</button>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => onPageChange(page - 1)}
+                        disabled={!hasPrevPage || isFetching}
+                        className={`px-5 py-2 text-sm font-bold rounded-xl border transition-all active:scale-95 ${!hasPrevPage || isFetching
+                                ? 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed'
+                                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-sm cursor-pointer'
+                            }`}
+                    >
+                        Previous
+                    </button>
+                    <button
+                        onClick={() => onPageChange(page + 1)}
+                        disabled={!hasNextPage || isFetching}
+                        className={`px-5 py-2 text-sm font-bold rounded-xl transition-all active:scale-95 ${!hasNextPage || isFetching
+                                ? 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed'
+                                : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 shadow-emerald-200/50 shadow-lg cursor-pointer'
+                            }`}
+                    >
+                        Next Segment
+                    </button>
                 </div>
             </div>
         </div>
