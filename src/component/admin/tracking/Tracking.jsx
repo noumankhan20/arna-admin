@@ -271,6 +271,45 @@ const Tracking = () => {
                                             )}
                                         </div>
                                     </div>
+                                    {/* Products Section */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-2 text-slate-400">
+                                            <Receipt className="w-4 h-4" />
+                                            <span className="text-xs font-bold uppercase tracking-wider">
+                                                Ordered Products
+                                            </span>
+                                        </div>
+
+                                        <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                                            {detail.items?.map((item, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="flex items-center justify-between border-b border-slate-200 pb-3 last:border-0 last:pb-0"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <img
+                                                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${item.image}`}
+                                                            alt={item.name}
+                                                            className="w-12 h-12 object-cover rounded-lg border"
+                                                            loading='lazy'
+                                                        />
+                                                        <div>
+                                                            <p className="text-sm font-semibold text-slate-800">
+                                                                {item.name}
+                                                            </p>
+                                                            <p className="text-xs text-slate-500">
+                                                                Qty: {item.quantity}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <p className="text-sm font-bold text-slate-800">
+                                                        ₹{item.price}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
 
                                     {/* Financial Details Section */}
                                     <div className="space-y-4">
@@ -310,7 +349,7 @@ const Tracking = () => {
                                                         Tax
                                                         <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-400">GST</span>
                                                     </span>
-                                                    <span className="text-slate-800 font-bold">+{detail.tax?.toLocaleString()}</span>
+                                                    <span className="text-slate-800 font-bold">+{detail.gstTotal?.toLocaleString()}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center text-sm">
                                                     <span className="text-emerald-600 font-semibold flex items-center gap-1.5">
