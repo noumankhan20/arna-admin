@@ -77,6 +77,19 @@ export const cmsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["OurStory"],
     }),
+
+    getProductsHero: builder.query({
+      query: () => "/producthero/products-hero",
+    }),
+    
+
+    updateProductsHero: builder.mutation({
+      query: (formData) => ({
+        url: "/producthero/update",
+        method: "PUT",
+        body: formData,
+      }),
+    }),
   }),
 });
 
@@ -89,4 +102,6 @@ export const {
   useDeleteHomeHeroMutation,
   useGetOurStoryQuery,
   useUpdateOurStoryMutation,
+  useGetProductsHeroQuery,
+  useUpdateProductsHeroMutation,
 } = cmsApi;

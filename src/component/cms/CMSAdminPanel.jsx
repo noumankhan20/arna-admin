@@ -11,6 +11,7 @@ import ContentSection from './ContentSection';
 import ProductsSection from './Products';
 import PromoMain from "./Promos/PromoMain"; // Your existing import
 import OurStorySection from "./OurStory"
+import ProductsHeroSection from './ProductHero';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 export default function CMSAdminPanel() {
@@ -184,6 +185,9 @@ export default function CMSAdminPanel() {
             )}
             {activeSection === 'ourstory' && (
               <OurStorySection />
+            )}
+            {activeSection === 'productshero' && (
+              <ProductsHeroSection />
             )}
 
           </div>
