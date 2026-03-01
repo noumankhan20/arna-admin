@@ -409,7 +409,7 @@ export default function ContentSection({
                   {isHomeHero && <span className="text-[9px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Recommended</span>}
                 </div>
 
-                <div className="relative">
+                <div className="relative flex justify-center">
                   <input
                     type="file"
                     id="mobile-image-upload"
@@ -419,7 +419,7 @@ export default function ContentSection({
                   />
 
                   {editForm.mobileImagePreview ? (
-                    <div className="group relative overflow-hidden rounded-[2rem] border-4 border-gray-50 shadow-inner h-64">
+                    <div className="group relative overflow-hidden rounded-[2.5rem] border-8 border-gray-900 shadow-2xl w-full max-w-[280px] aspect-[9/16]">
                       <img
                         src={editForm.mobileImagePreview}
                         alt="Mobile Preview"
@@ -446,7 +446,7 @@ export default function ContentSection({
                   ) : (
                     <label
                       htmlFor="mobile-image-upload"
-                      className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-[2rem] cursor-pointer transition-all border-amber-100 bg-amber-50/20 hover:bg-amber-50 group"
+                      className="flex flex-col items-center justify-center w-full max-w-[280px] aspect-[9/16] border-2 border-dashed rounded-[2.5rem] cursor-pointer transition-all border-amber-100 bg-amber-50/20 hover:bg-amber-50 group mx-auto"
                     >
                       <Upload className="w-8 h-8 text-amber-600 mb-2 group-hover:scale-110 transition-transform" />
                       <p className="text-xs font-bold text-amber-700">Upload Mobile Banner</p>
