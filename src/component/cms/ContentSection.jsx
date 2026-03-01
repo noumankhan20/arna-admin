@@ -419,13 +419,13 @@ export default function ContentSection({
                   />
 
                   {editForm.mobileImagePreview ? (
-                    <div className="group relative overflow-hidden rounded-[2.5rem] border-8 border-gray-900 shadow-2xl w-full max-w-[280px] aspect-[9/16]">
+                    <div className="group relative isolate overflow-hidden rounded-[2.5rem] border-8 border-gray-900 shadow-2xl w-full max-w-[280px] aspect-[9/16]">
                       <img
                         src={editForm.mobileImagePreview}
                         alt="Mobile Preview"
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 rounded-[inherit]"
                       />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-4">
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-4 rounded-[inherit]">
                         <button
                           onClick={() => document.getElementById("mobile-image-upload").click()}
                           className="bg-white text-gray-900 px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-emerald-50 transition-all"
