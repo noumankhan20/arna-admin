@@ -12,23 +12,7 @@ import {
     Line
 } from 'recharts';
 import { TrendingUp, Target, Activity } from 'lucide-react';
-
-const velocityData = [
-    { name: 'Mon', revenue: 4000, target: 4400 },
-    { name: 'Tue', revenue: 3000, target: 3200 },
-    { name: 'Wed', revenue: 2000, target: 2400 },
-    { name: 'Thu', revenue: 2780, target: 2900 },
-    { name: 'Fri', revenue: 1890, target: 2100 },
-    { name: 'Sat', revenue: 2390, target: 2500 },
-    { name: 'Sun', revenue: 3490, target: 3800 },
-];
-
-const historyData = [
-    { name: 'Week 1', current: 15000, previous: 12000 },
-    { name: 'Week 2', current: 18000, previous: 19000 },
-    { name: 'Week 3', current: 22000, previous: 17000 },
-    { name: 'Week 4', current: 25000, previous: 21000 },
-];
+import { useGetDashboardStatsQuery } from '../redux/slice/dashboardApiSlice';
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -56,6 +40,43 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const RevenueChart = () => {
     const [activeTab, setActiveTab] = useState('velocity');
+    const { data, isLoading } = useGetDashboardStatsQuery();
+
+    const velocityData = data?.velocityData || [];
+    const historyData = data?.historyData || [];
+
+    const calculateDiff = () => {
+        if (activeTab === 'velocity') {
+            const actual = velocityData.reduce((acc, d) => acc + d.revenue, 0);
+            const target = velocityData.reduce((acc, d) => acc + d.target, 0);
+            const diff = actual - target;
+            return {
+                label: diff >= 0 ? `+₹${diff.toLocaleString()} above benchmark` : `₹${Math.abs(diff).toLocaleString()} below benchmark`,
+                positive: diff >= 0
+            };
+        } else {
+            const current = historyData.reduce((acc, d) => acc + d.current, 0);
+            const previous = historyData.reduce((acc, d) => acc + d.previous, 0);
+            const diff = current - previous;
+            return {
+                label: diff >= 0 ? `+₹${diff.toLocaleString()} vs baseline` : `₹${Math.abs(diff).toLocaleString()} vs baseline`,
+                positive: diff >= 0
+            };
+        }
+    };
+
+    const diff = calculateDiff();
+
+    if (isLoading) {
+        return (
+            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm mb-8 h-[500px] flex items-center justify-center">
+                <div className="animate-pulse flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-full" />
+                    <div className="h-4 w-32 bg-gray-100 rounded" />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm mb-8 relative overflow-hidden group">
@@ -193,9 +214,9 @@ const RevenueChart = () => {
                         </span>
                     </div>
                 </div>
-                <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100/50">
+                <div className={`flex items-center gap-2 ${diff.positive ? 'text-emerald-600 bg-emerald-50 border-emerald-100/50' : 'text-red-600 bg-red-50 border-red-100/50'} px-4 py-2 rounded-xl border`}>
                     <TrendingUp className="w-4 h-4" />
-                    <span className="text-xs font-bold tracking-tight">+₹12,400 above benchmark</span>
+                    <span className="text-xs font-bold tracking-tight">{diff.label}</span>
                 </div>
             </div>
         </div>

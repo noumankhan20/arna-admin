@@ -2,26 +2,31 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
+import { useGetDashboardStatsQuery } from '../redux/slice/dashboardApiSlice';
 
 const RecentOrders = () => {
     const router = useRouter();
-    const orders = [
-        { id: '#ORD-7234', customer: 'Priya Sharma', amount: '₹2,499', status: 'Shipped', date: 'Oct 24, 2023' },
-        { id: '#ORD-7235', customer: 'Rahul Verma', amount: '₹1,250', status: 'Processing', date: 'Oct 24, 2023' },
-        { id: '#ORD-7236', customer: 'Ananya Iyer', amount: '₹4,890', status: 'Delivered', date: 'Oct 23, 2023' },
-        { id: '#ORD-7237', customer: 'Vikram Singh', amount: '₹999', status: 'Cancelled', date: 'Oct 23, 2023' },
-        { id: '#ORD-7238', customer: 'Sneha Kapur', amount: '₹3,150', status: 'Shipped', date: 'Oct 22, 2023' },
-    ];
+    const { data, isLoading } = useGetDashboardStatsQuery();
+    const orders = data?.recentOrders || [];
 
     const getStatusStyle = (status) => {
-        switch (status) {
-            case 'Delivered': return 'bg-emerald-100 text-emerald-700';
-            case 'Shipped': return 'bg-blue-100 text-blue-700';
-            case 'Processing': return 'bg-amber-100 text-amber-700';
-            case 'Cancelled': return 'bg-red-100 text-red-700';
+        switch (status?.toLowerCase()) {
+            case 'delivered': return 'bg-emerald-100 text-emerald-700';
+            case 'shipped': return 'bg-blue-100 text-blue-700';
+            case 'processing': return 'bg-amber-100 text-amber-700';
+            case 'cancelled': return 'bg-red-100 text-red-700';
+            case 'confirmed': return 'bg-purple-100 text-purple-700';
             default: return 'bg-gray-100 text-gray-700';
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center text-gray-400">
+                Loading recent orders...
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -46,7 +51,7 @@ const RecentOrders = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {orders.map((order) => (
+                        {orders.length > 0 ? orders.map((order) => (
                             <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
                                 <td className="px-6 py-4 font-medium text-gray-900">{order.id}</td>
                                 <td className="px-6 py-4 text-gray-600">{order.customer}</td>
@@ -58,7 +63,13 @@ const RecentOrders = () => {
                                 </td>
                                 <td className="px-6 py-4 text-gray-500 text-sm">{order.date}</td>
                             </tr>
-                        ))}
+                        )) : (
+                            <tr>
+                                <td colSpan="5" className="px-6 py-8 text-center text-gray-400 italic">
+                                    No orders found yet
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
