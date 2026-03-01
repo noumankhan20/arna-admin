@@ -42,11 +42,11 @@ const Sidebar = () => {
             icon: Search,
             path: '/admin/tracking'
         },
-        {
-            name: 'Analysis',
-            icon: BarChart3,
-            path: '/admin/analysis'
-        },
+        // {
+        //     name: 'Analysis',
+        //     icon: BarChart3,
+        //     path: '/admin/analysis'
+        // },
         {
             name: 'Tickets & Queries ',
             icon: TicketCheck,
