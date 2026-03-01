@@ -76,7 +76,7 @@ const StatCards = () => {
         },
         {
             title: "Recent Pulse",
-            value: statsData?.totalOrders || 0,
+            value: statsData?.ordersToday || 0,
             icon: Clock,
             trend: "+0%",
             subtitle: "Orders today",
