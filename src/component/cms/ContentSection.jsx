@@ -24,6 +24,7 @@ export default function ContentSection({
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("success");
   const [pendingFile, setPendingFile] = useState(null);
+  const [pendingMobileFile, setPendingMobileFile] = useState(null);
   const [selectedSlideId, setSelectedSlideId] = useState(null); // The 'section' identifier of the slide
   const [isAddingNew, setIsAddingNew] = useState(false);
 
@@ -51,6 +52,8 @@ export default function ContentSection({
     description: '',
     imagePreview: '',
     imageUrl: '',
+    mobileImagePreview: '',
+    mobileImageUrl: '',
     mediaType: 'image'
   });
 
@@ -69,9 +72,13 @@ export default function ContentSection({
           title: d.title || '',
           description: d.description || '',
           imageUrl: d.imageUrl || '',
+          mobileImageUrl: d.mobileImageUrl || '',
           mediaType: d.mediaType || 'image',
           imagePreview: d.imageUrl
             ? (d.imageUrl.startsWith('http') ? d.imageUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL}${d.imageUrl}`)
+            : '',
+          mobileImagePreview: d.mobileImageUrl
+            ? (d.mobileImageUrl.startsWith('http') ? d.mobileImageUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL}${d.mobileImageUrl}`)
             : ''
         });
       }
@@ -87,9 +94,13 @@ export default function ContentSection({
           title: slide.title || '',
           description: slide.description || '',
           imageUrl: slide.imageUrl || '',
+          mobileImageUrl: slide.mobileImageUrl || '',
           mediaType: slide.mediaType || 'image',
           imagePreview: slide.imageUrl
             ? (slide.imageUrl.startsWith('http') ? slide.imageUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL}${slide.imageUrl}`)
+            : '',
+          mobileImagePreview: slide.mobileImageUrl
+            ? (slide.mobileImageUrl.startsWith('http') ? slide.mobileImageUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL}${slide.mobileImageUrl}`)
             : ''
         });
         setIsAddingNew(false);
@@ -115,7 +126,7 @@ export default function ContentSection({
     setEditForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = (e, target = 'desktop') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -132,13 +143,22 @@ export default function ContentSection({
       return;
     }
 
-    setPendingFile(file);
     const previewUrl = URL.createObjectURL(file);
-    setEditForm(prev => ({
-      ...prev,
-      imagePreview: previewUrl,
-      mediaType: isVideo ? 'video' : 'image'
-    }));
+
+    if (target === 'mobile') {
+      setPendingMobileFile(file);
+      setEditForm(prev => ({
+        ...prev,
+        mobileImagePreview: previewUrl,
+      }));
+    } else {
+      setPendingFile(file);
+      setEditForm(prev => ({
+        ...prev,
+        imagePreview: previewUrl,
+        mediaType: isVideo ? 'video' : 'image'
+      }));
+    }
   };
 
   const handleSave = async () => {
@@ -167,10 +187,15 @@ export default function ContentSection({
         formData.append("mediaType", editForm.mediaType);
       }
 
+      if (pendingMobileFile) {
+        formData.append("mobileImage", pendingMobileFile);
+      }
+
       const res = await saveData(formData).unwrap();
       showSuccessToast(isAddingNew ? 'Slide created!' : 'Saved successfully!');
 
       setPendingFile(null);
+      setPendingMobileFile(null);
       if (isAddingNew) {
         setIsAddingNew(false);
         setSelectedSlideId(res.data.section);
@@ -203,11 +228,14 @@ export default function ContentSection({
     setIsAddingNew(true);
     setSelectedSlideId(null);
     setPendingFile(null);
+    setPendingMobileFile(null);
     setEditForm({
       title: '',
       description: '',
       imagePreview: '',
       imageUrl: '',
+      mobileImagePreview: '',
+      mobileImageUrl: '',
       mediaType: 'image'
     });
   };
@@ -316,65 +344,115 @@ export default function ContentSection({
 
           <div className="p-10 space-y-10">
             {/* Image Upload Area */}
-            <div className="space-y-4">
-              <label className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
-                <Layout className="w-4 h-4 text-emerald-500" />
-                Visual Asset
-              </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Desktop Upload Area */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+                    <Layout className="w-4 h-4 text-emerald-500" />
+                    Desktop Visual (Landscape)
+                  </label>
+                </div>
 
-              <div className="relative">
-                <input
-                  type="file"
-                  id="image-upload"
-                  accept="image/*,video/*"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
+                <div className="relative">
+                  <input
+                    type="file"
+                    id="image-upload"
+                    accept="image/*,video/*"
+                    onChange={(e) => handleFileSelect(e, 'desktop')}
+                    className="hidden"
+                  />
 
-                {editForm.imagePreview ? (
-                  <div className="group relative overflow-hidden rounded-[2rem] border-4 border-gray-50 shadow-inner max-h-[400px]">
-                    {editForm.mediaType === 'video' ? (
-                      <video
-                        src={editForm.imagePreview}
-                        className="w-full h-full object-cover"
-                        controls
-                      />
-                    ) : (
+                  {editForm.imagePreview ? (
+                    <div className="group relative overflow-hidden rounded-[2rem] border-4 border-gray-50 shadow-inner h-64">
+                      {editForm.mediaType === 'video' ? (
+                        <video
+                          src={editForm.imagePreview}
+                          className="w-full h-full object-cover"
+                          controls
+                        />
+                      ) : (
+                        <img
+                          src={editForm.imagePreview}
+                          alt="Preview"
+                          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-4">
+                        <button
+                          onClick={() => document.getElementById("image-upload").click()}
+                          className="bg-white text-gray-900 px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-emerald-50 transition-all"
+                        >
+                          Replace
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label
+                      htmlFor="image-upload"
+                      className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-[2rem] cursor-pointer transition-all border-emerald-100 bg-emerald-50/20 hover:bg-emerald-50 group"
+                    >
+                      <Upload className="w-8 h-8 text-emerald-600 mb-2 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-emerald-700">Upload Desktop Banner</p>
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Mobile Upload Area */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+                    <Layout className="w-4 h-4 text-amber-500" />
+                    Mobile Visual (Portrait)
+                  </label>
+                  {isHomeHero && <span className="text-[9px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Recommended</span>}
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="file"
+                    id="mobile-image-upload"
+                    accept="image/*"
+                    onChange={(e) => handleFileSelect(e, 'mobile')}
+                    className="hidden"
+                  />
+
+                  {editForm.mobileImagePreview ? (
+                    <div className="group relative overflow-hidden rounded-[2rem] border-4 border-gray-50 shadow-inner h-64">
                       <img
-                        src={editForm.imagePreview}
-                        alt="Preview"
+                        src={editForm.mobileImagePreview}
+                        alt="Mobile Preview"
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                       />
-                    )}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-4">
-                      <button
-                        onClick={() => document.getElementById("image-upload").click()}
-                        className="bg-white text-gray-900 px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-50 hover:text-emerald-700 transition-all shadow-2xl scale-95 group-hover:scale-100"
-                      >
-                        Swap Image
-                      </button>
-                      <button
-                        onClick={() => setEditForm(p => ({ ...p, imagePreview: '', imageUrl: '' }))}
-                        className="bg-red-500 text-white px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-red-600 transition-all shadow-2xl scale-95 group-hover:scale-100"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <label
-                    htmlFor="image-upload"
-                    className="flex flex-col items-center justify-center w-full h-80 border-4 border-dashed rounded-[2.5rem] cursor-pointer transition-all border-emerald-100 bg-emerald-50/20 hover:bg-emerald-50 hover:border-emerald-300 group"
-                  >
-                    <div className="text-center p-12">
-                      <div className="w-20 h-20 bg-emerald-100 rounded-[2rem] flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl shadow-emerald-100">
-                        <Upload className="w-10 h-10 text-emerald-600" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-4">
+                        <button
+                          onClick={() => document.getElementById("mobile-image-upload").click()}
+                          className="bg-white text-gray-900 px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-emerald-50 transition-all"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          onClick={() => {
+                            setPendingMobileFile(null);
+                            setEditForm(p => ({ ...p, mobileImagePreview: '', mobileImageUrl: '' }));
+                          }}
+                          className="bg-red-500 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-red-600 transition-all"
+                        >
+                          Clear
+                        </button>
                       </div>
-                      <p className="text-lg font-bold text-emerald-700 tracking-tight">Drop Hero Visual Here</p>
-                      <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest mt-2">Support: JPG, PNG, WEBP, MP4, WEBM (Max 50MB for video)</p>
                     </div>
-                  </label>
-                )}
+                  ) : (
+                    <label
+                      htmlFor="mobile-image-upload"
+                      className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-[2rem] cursor-pointer transition-all border-amber-100 bg-amber-50/20 hover:bg-amber-50 group"
+                    >
+                      <Upload className="w-8 h-8 text-amber-600 mb-2 group-hover:scale-110 transition-transform" />
+                      <p className="text-xs font-bold text-amber-700">Upload Mobile Banner</p>
+                    </label>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -409,7 +487,7 @@ export default function ContentSection({
             <div className="flex items-center gap-3">
               <div className={`w-2.5 h-2.5 rounded-full ${pendingFile || isAddingNew ? 'bg-amber-400 animate-pulse' : 'bg-emerald-500'}`} />
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                {pendingFile ? 'Local Changes Staged' : (isAddingNew ? 'New Entry Pending' : 'Cloud Copy Synced')}
+                {pendingFile || pendingMobileFile ? 'Local Changes Staged' : (isAddingNew ? 'New Entry Pending' : 'Cloud Copy Synced')}
               </p>
             </div>
 
