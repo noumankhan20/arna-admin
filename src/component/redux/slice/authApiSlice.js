@@ -22,6 +22,22 @@ export const authApi = apiSlice.injectEndpoints({
       query: () => "/admin/me",
       providesTags: ["Admin"],
     }),
+
+    forgotPassword: builder.mutation({
+      query: (data) => ({
+        url: "/admin/forgot-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+    resetPassword: builder.mutation({
+      query: (data) => ({
+        url: "/admin/reset-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -29,4 +45,6 @@ export const {
   useLoginAdminMutation,
   useLogoutAdminMutation,
   useGetAdminProfileQuery,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
 } = authApi;

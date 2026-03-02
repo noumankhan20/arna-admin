@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Eye, EyeOff, User, Lock, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 import Image from "next/image"
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { toast } from "react-toastify";
 import { useLoginAdminMutation } from '@/component/redux/slice/authApiSlice';
 
@@ -162,13 +163,13 @@ export default function AdminLogin() {
 
               {/* Forgot Password */}
               <div className="flex items-center justify-end">
-                <a
-                  href="#"
+                <Link
+                  href="/forgot-password"
                   className="text-sm text-black hover:text-black font-semibold transition-colors group inline-flex items-center gap-1"
                 >
                   Forgot password?
                   <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
-                </a>
+                </Link>
               </div>
 
               {/* Submit Button */}
