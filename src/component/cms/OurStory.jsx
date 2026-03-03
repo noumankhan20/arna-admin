@@ -89,14 +89,14 @@ export default function OurStorySection() {
                 </p>
 
                 {/* Image Preview */}
-                <div className="relative aspect-[4/3] border-2 border-emerald-200 rounded-lg overflow-hidden mb-4">
-                    <img
-                        src={previewUrl}
-                        alt="Our Story Preview"
-                        className="w-full h-full object-cover"
-                        loading='lazy'
-                    />
-                </div>
+                <div className="relative h-[700px] border-2 border-emerald-200 rounded-2xl overflow-hidden mb-4 shadow-2xl group">
+    <img
+        src={previewUrl}
+        alt="Our Story Preview"
+        className="w-full h-full object-cover object-center transition-transform duration-1000 group-hover:scale-110"
+        loading='lazy'
+    />
+</div>
 
                 {/* File Upload Button */}
                 <div className="mb-4">
