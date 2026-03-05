@@ -10,4 +10,5 @@ export const PRODUCT_CATEGORIES = [
   "serums",
   "soaps",
   "hair-care",
+  "toners"
 ];
