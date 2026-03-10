@@ -31,14 +31,32 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
       providesTags: (result) =>
         result?.orders
           ? [
-              ...result.orders.map(({ _id }) => ({
-                type: "Order",
-                id: _id,
-              })),
-              { type: "Order", id: "LIST" },
-            ]
+            ...result.orders.map(({ _id }) => ({
+              type: "Order",
+              id: _id,
+            })),
+            { type: "Order", id: "LIST" },
+          ]
           : [{ type: "Order", id: "LIST" }],
       keepUnusedDataFor: 60,
+    }),
+
+
+    getShipmentLabel: builder.mutation({
+      query: (orderId) => ({
+        url: `/orders/${orderId}/label`,
+        method: "GET",
+      }),
+    }),
+
+    // ---------------------------
+    // PRINT MANIFEST
+    // ---------------------------
+    getShipmentManifest: builder.mutation({
+      query: (orderId) => ({
+        url: `/orders/${orderId}/manifest`,
+        method: "GET",
+      }),
     }),
 
   }),
@@ -47,4 +65,6 @@ export const ordersApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useGetAllOrdersQuery,
+  useGetShipmentLabelMutation,
+  useGetShipmentManifestMutation
 } = ordersApiSlice;

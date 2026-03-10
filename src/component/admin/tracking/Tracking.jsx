@@ -6,7 +6,7 @@ import TrackingHeader from './TrackingHeader';
 import TrackingStats from './TrackingStats';
 import TrackingFilters from './TrackingFilters';
 import TrackingTable from './TrackingTable';
-import { useGetAllOrdersQuery } from '@/component/redux/slice/ordersApiSlice';
+import { useGetAllOrdersQuery, useGetShipmentLabelMutation, useGetShipmentManifestMutation } from '@/component/redux/slice/ordersApiSlice';
 
 const Tracking = () => {
     const [search, setSearch] = useState("");
@@ -21,7 +21,8 @@ const Tracking = () => {
     });
 
     const { data: ordersData, isLoading, isFetching, error } = useGetAllOrdersQuery(filters);
-
+    const [getShipmentLabel] = useGetShipmentLabelMutation();
+    const [getShipmentManifest] = useGetShipmentManifestMutation();
     const handlePageChange = (newPage) => {
         setFilters(prev => ({ ...prev, page: newPage }));
     };
@@ -68,6 +69,28 @@ const Tracking = () => {
             item.awbNumber?.toLowerCase().includes(q)
         );
     }, [shipments, search]);
+
+    const handlePrintLabel = async (orderId) => {
+        try {
+            const res = await getShipmentLabel(orderId).unwrap();
+            if (res?.labelUrl) {
+                window.open(res.labelUrl, "_blank");
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handlePrintManifest = async (orderId) => {
+        try {
+            const res = await getShipmentManifest(orderId).unwrap();
+            if (res?.manifestUrl) {
+                window.open(res.manifestUrl, "_blank");
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     // ✅ No API call — just find from existing data
     const handleViewMore = (orderId) => {
@@ -267,6 +290,25 @@ const Tracking = () => {
                                                     >
                                                         Track Shipment →
                                                     </a>
+                                                </div>
+                                            )}
+                                            {detail.awbNumber && (
+                                                <div className="col-span-2 flex gap-3 pt-2">
+
+                                                    <button
+                                                        onClick={() => handlePrintLabel(detail.orderId)}
+                                                        className="px-4 py-2 text-xs font-bold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+                                                    >
+                                                        Print Label
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => handlePrintManifest(detail.orderId)}
+                                                        className="px-4 py-2 text-xs font-bold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                                                    >
+                                                        Print Manifest
+                                                    </button>
+
                                                 </div>
                                             )}
                                         </div>
