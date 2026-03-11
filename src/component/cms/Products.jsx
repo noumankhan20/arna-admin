@@ -22,7 +22,11 @@ export default function ProductsSection({ showSuccessToast }) {
   });
 
   // RTK Query hooks
-  const { data: productsData, isLoading, error } = useGetAllProductsQuery(filters);
+  const { data: productsData, isLoading, error } = useGetAllProductsQuery(filters, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,       // 👈 prevents refetch on tab focus
+    refetchOnReconnect: false,
+  });
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
@@ -54,6 +58,7 @@ export default function ProductsSection({ showSuccessToast }) {
       link: '',
       isBestSeller: false,
       isNewArrival: false,
+      displayOrder: null,
     });
     setShowForm(true);
   };
@@ -70,6 +75,7 @@ export default function ProductsSection({ showSuccessToast }) {
       salePrice: product.salePrice || '',
       isBestSeller: product.isBestSeller || false,
       isNewArrival: product.isNewArrival || false,
+      displayOrder: product.displayOrder ?? '',
     });
     setShowForm(true);
   };
@@ -121,7 +127,14 @@ export default function ProductsSection({ showSuccessToast }) {
 
       formData.append('isBestSeller', editingProduct.isBestSeller ? 'true' : 'false');
       formData.append('isNewArrival', editingProduct.isNewArrival ? 'true' : 'false');
+      const order = Number(editingProduct.displayOrder);
 
+      if (!order || order < 1) {
+        showSuccessToast("Display order must be at least 1", "error");
+        return;
+      }
+
+      formData.append("displayOrder", order);
 
       // Only append image if a new file was selected
       if (editingProduct.imageFile) {
@@ -402,6 +415,30 @@ export default function ProductsSection({ showSuccessToast }) {
               </div>
             </div>
 
+            {/* Display Order */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900">
+                Display Order
+              </label>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={editingProduct.displayOrder ?? ""}
+                onChange={(e) =>
+                  setEditingProduct(prev => ({
+                    ...prev,
+                    displayOrder: e.target.value
+                  }))
+                }
+                onWheel={(e) => e.target.blur()}
+                placeholder="Enter display position"
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              />
+              <p className="text-xs text-gray-500">
+                Lower numbers appear first on the website.
+              </p>
+            </div>
+
             {/* Description */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-900">
@@ -626,6 +663,9 @@ export default function ProductsSection({ showSuccessToast }) {
               className="group bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300 flex flex-col h-full"
             >
               <div className="relative aspect-square bg-gray-100 overflow-hidden flex-shrink-0">
+                <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                  Order {product.displayOrder}
+                </div>
                 {product.image ? (
                   <img
                     src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${product.image}`}
