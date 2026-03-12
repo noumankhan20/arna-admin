@@ -362,13 +362,6 @@ const Tracking = () => {
                                         <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 shadow-sm overflow-hidden">
                                             <div className="p-4 grid grid-cols-2 gap-4">
                                                 <div className="space-y-1">
-                                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Transaction ID</label>
-                                                    <div className="flex items-center gap-1.5 text-slate-700">
-                                                        <Hash className="w-3.5 h-3.5 text-slate-300" />
-                                                        <span className="text-sm font-mono font-bold truncate">{detail.transactionId || 'N/A'}</span>
-                                                    </div>
-                                                </div>
-                                                <div className="space-y-1">
                                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Currency</label>
                                                     <div className="flex items-center gap-1.5 text-slate-700">
                                                         <CreditCard className="w-3.5 h-3.5 text-slate-300" />
