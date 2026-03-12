@@ -407,7 +407,7 @@ const Tracking = () => {
                                                             Promo Used
                                                         </span>
                                                         <span className="text-indigo-600 font-black tracking-wider text-xs bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
-                                                            {detail.appliedPromo}
+                                                            {detail.appliedPromo?.promoCode}
                                                         </span>
                                                     </div>
                                                 )}
