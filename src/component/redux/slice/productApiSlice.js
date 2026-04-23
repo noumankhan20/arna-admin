@@ -39,6 +39,14 @@ export const productApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Products"],
     }),
+
+    toggleProductStatus: builder.mutation({
+      query: (id) => ({
+        url: `/products/${id}/toggle-status`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Products"],
+    }),
   }),
 });
 
@@ -48,4 +56,5 @@ export const {
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useToggleProductStatusMutation
 } = productApi;

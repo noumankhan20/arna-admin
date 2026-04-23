@@ -5,7 +5,8 @@ import {
   useCreateProductMutation,
   useGetAllProductsQuery,
   useUpdateProductMutation,
-  useDeleteProductMutation
+  useDeleteProductMutation,
+  useToggleProductStatusMutation
 } from "../redux/slice/productApiSlice";
 import { PRODUCT_CATEGORIES } from "../constants/product.constants";
 
@@ -30,6 +31,7 @@ export default function ProductsSection({ showSuccessToast }) {
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
+  const [toggleProductStatus, { isLoading: isToggling }] = useToggleProductStatusMutation();
   const products = productsData?.data || [];
 
   const filteredProducts = useMemo(() => {
@@ -178,6 +180,16 @@ export default function ProductsSection({ showSuccessToast }) {
     } catch (err) {
       console.error('Delete product error:', err);
       showSuccessToast(err?.data?.message || 'Failed to delete product', 'error');
+    }
+  };
+
+  const handleToggleStatus = async (id) => {
+    try {
+      const result = await toggleProductStatus(id).unwrap();
+      showSuccessToast(result.message || "Status updated successfully");
+    } catch (err) {
+      console.error("Toggle status error:", err);
+      showSuccessToast(err?.data?.message || "Failed to update status", "error");
     }
   };
 
@@ -680,6 +692,11 @@ export default function ProductsSection({ showSuccessToast }) {
 
                 {/* Badges */}
                 <div className="absolute top-3 left-3 flex gap-2">
+                  {!product.isActive && (
+                    <span className="bg-red-500  text-white text-xs px-2 py-1 rounded">
+                      Disabled
+                    </span>
+                  )}
                   {product.isBestSeller && (
                     <span className="bg-emerald-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
                       Best Seller
@@ -707,16 +724,37 @@ export default function ProductsSection({ showSuccessToast }) {
               <div className="p-5 flex flex-col flex-grow">
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-900 truncate mb-2">{product.name}</h4>
-                    <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">{product.description}</p>
+                    <h4 className="font-semibold text-gray-900 truncate mb-2">
+                      {product.name}
+                    </h4>
+                    <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
+                      {product.description}
+                    </p>
                   </div>
-                  <button
-                    onClick={() => handleDeleteProduct(product._id)}
-                    disabled={isDeleting}
-                    className="p-2 text-gray-500 hover:text-red-500 cursor-pointer hover:bg-red-100 rounded-lg transition-colors flex-shrink-0 disabled:opacity-50"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+
+                  {/* ACTION BUTTONS */}
+                  <div className="flex gap-2">
+                    {/* ✅ TOGGLE BUTTON */}
+                    <button
+                      onClick={() => handleToggleStatus(product._id)}
+                      disabled={isToggling}
+                      className={`px-2 py-1 text-xs rounded-md font-medium transition ${product.isActive
+                        ? "bg-red-100 text-red-600 cursor-pointer hover:bg-red-200"
+                        : "bg-green-100 text-green-600 hover:bg-green-200"
+                        }`}
+                    >
+                      {product.isActive ? "Disable" : "Enable"}
+                    </button>
+
+                    {/* DELETE BUTTON */}
+                    <button
+                      onClick={() => handleDeleteProduct(product._id)}
+                      disabled={isDeleting}
+                      className="p-2 text-gray-500 hover:text-red-500 cursor-pointer hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 <p className="text-sm text-gray-600 mb-1">
                   {product.quantity} {product.unit}
