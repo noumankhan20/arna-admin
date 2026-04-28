@@ -1,21 +1,28 @@
 'use client';
 import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { apiSlice } from '../redux/slice/apiSlice';
 import { useRouter } from 'next/navigation';
 import { LayoutDashboard, FileEdit, ChevronRight, LogOut } from 'lucide-react';
 import { useLogoutAdminMutation, useGetAdminProfileQuery } from '../redux/slice/authApiSlice';
 import { toast } from 'react-toastify';
 export default function SelectPortal() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [logoutAdmin, { isLoading: isLoggingOut }] = useLogoutAdminMutation();
   const { isLoading, isError } = useGetAdminProfileQuery(undefined, {
     refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
   });
 
   const handleLogout = async () => {
     try {
       await logoutAdmin().unwrap();
+      dispatch(apiSlice.util.resetApiState());
       toast.success("Logged out successfully");
-      router.replace("/");
+      router.refresh();
+        window.location.replace("/login")
     } catch (error) {
       toast.error("Logout failed");
     }
@@ -52,6 +59,17 @@ export default function SelectPortal() {
   const handlePortalClick = (route) => {
     router.push(route);
   };
+  useEffect(() => {
+    const handleFocus = () => {
+      router.refresh();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-gray-50">
