@@ -33,6 +33,17 @@ export default function SelectPortal() {
       router.replace("/login"); // replace is IMPORTANT
     }
   }, [isLoading, isError, router]);
+  useEffect(() => {
+    const handleFocus = () => {
+      router.refresh();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [router]);
 
   if (isLoading) {
     return null; // or a loader
@@ -59,17 +70,7 @@ export default function SelectPortal() {
   const handlePortalClick = (route) => {
     router.push(route);
   };
-  useEffect(() => {
-    const handleFocus = () => {
-      router.refresh();
-    };
-
-    window.addEventListener("focus", handleFocus);
-
-    return () => {
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, [router]);
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-gray-50">
