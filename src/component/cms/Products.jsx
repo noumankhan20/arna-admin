@@ -142,10 +142,7 @@ export default function ProductsSection({ showSuccessToast }) {
       if (editingProduct.imageFile) {
         formData.append('image', editingProduct.imageFile);
       }
-
-      if (editingProduct.link) {
-        formData.append('link', editingProduct.link);
-      }
+        formData.append('link', editingProduct.link ?? "");
 
 
       let result;
