@@ -1,37 +1,45 @@
-"use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Home, Info, Star, FileText, Package,
   Menu, X, CheckCircle2,
   ArrowLeft
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { initialCMSData } from './initialCMSData';
 import { sidebarItems } from './CMSSidebar';
 import ContentSection from './ContentSection';
 import ProductsSection from './Products';
-import PromoMain from "./Promos/PromoMain"; // Your existing import
+import PromoMain from "./Promos/PromoMain";
 import OurStorySection from "./OurStory"
 import ProductsHeroSection from './ProductHero';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useGetAdminProfileQuery } from '../redux/slice/authApiSlice';
+
 export default function CMSAdminPanel() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeSection, setActiveSection] = useState('home-hero');
   const [cmsData, setCmsData] = useState(initialCMSData);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
   const router = useRouter();
   const navItems = sidebarItems;
 
+  const { data: adminData, isLoading, isError } = useGetAdminProfileQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+  });
+
+  useEffect(() => {
+    if (!isLoading && isError) {
+      router.replace('/login');
+    }
+  }, [isLoading, isError, router]);
+
   const showSuccessToast = (message) => {
-    setToastMessage(message);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+    toast.success(message);
   };
 
   const handleSave = (section) => {
-    console.log('Saving:', section, cmsData[section]);
-    showSuccessToast('Changes saved successfully!');
+    toast.success('Changes saved successfully!');
   };
 
   const handleSidebarToggle = () => {
@@ -44,6 +52,18 @@ export default function CMSAdminPanel() {
       setSidebarOpen(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Loading CMS...</p>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 flex overflow-hidden">
@@ -116,11 +136,11 @@ export default function CMSAdminPanel() {
             <div className="p-4 flex-shrink-0">
               <div className="flex items-center gap-3 px-4 py-3 bg-white/15 backdrop-blur-md rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300 group">
                 <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-emerald-600 font-semibold text-sm shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  A
+                  {adminData?.admin?.fullName ? adminData.admin.fullName.charAt(0).toUpperCase() : 'A'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">Admin User</p>
-                  <p className="text-xs text-emerald-50 truncate">admin@arna.com</p>
+                  <p className="text-sm font-medium text-white truncate">{adminData?.admin?.fullName || 'Admin'}</p>
+                  <p className="text-xs text-emerald-50 truncate">{adminData?.admin?.email || 'admin@arnacare.com'}</p>
                 </div>
               </div>
             </div>
@@ -193,15 +213,6 @@ export default function CMSAdminPanel() {
           </div>
         </main>
       </div>
-
-      {showToast && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 duration-300">
-          <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-emerald-400/20">
-            <CheckCircle2 className="w-5 h-5 animate-in zoom-in duration-300" />
-            <span className="font-medium">{toastMessage}</span>
-          </div>
-        </div>
-      )}
 
       {sidebarOpen && (
         <div

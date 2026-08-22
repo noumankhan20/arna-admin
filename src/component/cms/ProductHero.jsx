@@ -1,6 +1,5 @@
-'use client';
-
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useGetProductsHeroQuery, useUpdateProductsHeroMutation } from '../redux/slice/cmsApiSlice';
 
 export default function ProductsHeroSection() {
@@ -28,14 +27,18 @@ export default function ProductsHeroSection() {
 
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
         if (!validTypes.includes(file.type)) {
-            setError('Please select a valid image file (JPG, PNG, or WEBP)');
+            const msg = 'Please select a valid image file (JPG, PNG, or WEBP)';
+            setError(msg);
+            toast.error(msg);
             setSelectedImage(null);
             return;
         }
 
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
-            setError('File size must be less than 5MB');
+            const msg = 'File size must be less than 5MB';
+            setError(msg);
+            toast.error(msg);
             setSelectedImage(null);
             return;
         }
@@ -54,13 +57,14 @@ export default function ProductsHeroSection() {
 
             await updateProductsHero(formData).unwrap();
 
-            alert("Products hero image updated successfully");
+            toast.success("Products hero image updated successfully");
             setSelectedImage(null);
         } catch (err) {
             console.error(err);
-            alert("Update failed");
+            toast.error(err?.data?.message || "Failed to update hero image");
         }
     };
+
 
     if (isLoading) {
         return (

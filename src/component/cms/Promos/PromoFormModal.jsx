@@ -1,7 +1,5 @@
-// components/admin/promos/PromoFormModal.jsx
-'use client';
-
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 export default function PromoFormModal({ isOpen, onClose, onSubmit, editPromo, isLoading }) {
     const [formData, setFormData] = useState({
@@ -118,7 +116,7 @@ export default function PromoFormModal({ isOpen, onClose, onSubmit, editPromo, i
 
         if (formData.promoType === 'IMAGE') {
             if (!editPromo && !formData.bannerImage) {
-                alert('Banner image is required');
+                toast.error('Banner image is required');
                 return;
             }
 
@@ -138,6 +136,7 @@ export default function PromoFormModal({ isOpen, onClose, onSubmit, editPromo, i
 
         onSubmit(fd);
     };
+
 
 
     if (!isOpen) return null;

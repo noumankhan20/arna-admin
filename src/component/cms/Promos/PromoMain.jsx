@@ -1,7 +1,5 @@
-// app/admin/promos/page.jsx
-'use client';
-
 import { useState, useMemo } from 'react';
+import { toast } from 'react-toastify';
 import {
   useGetAllPromosQuery,
   useCreatePromoMutation,
@@ -63,19 +61,20 @@ export default function PromosPage() {
       if (editPromo) {
         await updatePromo({
           id: editPromo._id,
-          formData, // 👈 IMPORTANT
+          formData,
         }).unwrap();
+        toast.success('Promo code updated successfully!');
       } else {
         await createPromo(formData).unwrap();
+        toast.success('Promo code created successfully!');
       }
 
       handleFormClose();
     } catch (error) {
       console.error('Failed to save promo:', error);
-      alert(error?.data?.message || 'Failed to save promo code. Please try again.');
+      toast.error(error?.data?.message || 'Failed to save promo code. Please try again.');
     }
   };
-
 
   const handleDeleteClick = (id, code) => {
     setDeleteModal({ isOpen: true, id, code });
@@ -84,10 +83,11 @@ export default function PromosPage() {
   const handleDeleteConfirm = async () => {
     try {
       await deletePromo(deleteModal.id).unwrap();
+      toast.success(`Promo code ${deleteModal.code} deleted`);
       setDeleteModal({ isOpen: false, id: null, code: '' });
     } catch (error) {
       console.error('Failed to delete promo:', error);
-      alert(error?.data?.message || 'Failed to delete promo code. Please try again.');
+      toast.error(error?.data?.message || 'Failed to delete promo code. Please try again.');
     }
   };
 
@@ -98,11 +98,13 @@ export default function PromosPage() {
   const handleToggleStatus = async (id) => {
     try {
       await togglePromoStatus(id).unwrap();
+      toast.success('Promo status updated');
     } catch (error) {
       console.error('Failed to toggle status:', error);
-      alert(error?.data?.message || 'Failed to update status. Please try again.');
+      toast.error(error?.data?.message || 'Failed to update status. Please try again.');
     }
   };
+
 
   const promos = data?.data || [];
   const totalPages = data?.totalPages || 1;

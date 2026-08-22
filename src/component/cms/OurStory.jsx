@@ -1,12 +1,11 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { toast } from 'react-toastify';
 import { useGetOurStoryQuery, useUpdateOurStoryMutation } from '../redux/slice/cmsApiSlice';
+
 export default function OurStorySection() {
     const { data, isLoading, isError } = useGetOurStoryQuery();
-    const [updateOurStory, { isLoading: isUpdating }] =
-        useUpdateOurStoryMutation();
+    const [updateOurStory, { isLoading: isUpdating }] = useUpdateOurStoryMutation();
 
     const [selectedImage, setSelectedImage] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop');
@@ -26,14 +25,18 @@ export default function OurStorySection() {
 
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
         if (!validTypes.includes(file.type)) {
-            setError('Please select a valid image file (JPG, PNG, or WEBP)');
+            const msg = 'Please select a valid image file (JPG, PNG, or WEBP)';
+            setError(msg);
+            toast.error(msg);
             setSelectedImage(null);
             return;
         }
 
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
-            setError('File size must be less than 5MB');
+            const msg = 'File size must be less than 5MB';
+            setError(msg);
+            toast.error(msg);
             setSelectedImage(null);
             return;
         }
@@ -42,7 +45,6 @@ export default function OurStorySection() {
         const objectUrl = URL.createObjectURL(file);
         setPreviewUrl(objectUrl);
     };
-
 
     const handleUpdate = async () => {
         if (!selectedImage) return;
@@ -53,13 +55,14 @@ export default function OurStorySection() {
 
             await updateOurStory(formData).unwrap();
 
-            alert("Image updated successfully");
+            toast.success("Our Story image updated successfully");
             setSelectedImage(null);
         } catch (err) {
             console.error(err);
-            alert("Update failed");
+            toast.error(err?.data?.message || "Failed to update image");
         }
     };
+
 
     if (isLoading) {
         return (

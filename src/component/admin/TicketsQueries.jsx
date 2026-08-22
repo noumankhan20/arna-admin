@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Ticket, CheckCircle, XCircle, Clock, Mail, Calendar, Eye, X } from 'lucide-react';
+import { toast } from 'react-toastify';
 import {
     useGetAllTicketsQuery,
     useUpdateTicketStatusMutation,
@@ -14,7 +15,7 @@ export default function TicketsAndQueries() {
         isError,
         error,
     } = useGetAllTicketsQuery();
-    const [updateTicketStatusMutation] = useUpdateTicketStatusMutation();
+    const [updateTicketStatusMutation, { isLoading: isUpdating }] = useUpdateTicketStatusMutation();
 
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,13 +23,20 @@ export default function TicketsAndQueries() {
 
     // Toggle ticket status between open and resolved
     const updateTicketStatus = async (ticketId, newStatus) => {
+        if (!ticketId) {
+            toast.error("Invalid ticket ID");
+            return;
+        }
+
         try {
             await updateTicketStatusMutation({
                 id: ticketId,
                 status: newStatus,
             }).unwrap();
+            toast.success(`Ticket marked as ${newStatus}`);
         } catch (err) {
             console.error("Failed to update ticket status", err);
+            toast.error(err?.data?.message || "Failed to update ticket status");
         }
     };
 
@@ -46,7 +54,9 @@ export default function TicketsAndQueries() {
 
     // Format date to be more readable
     const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
         const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'N/A';
         return date.toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
@@ -196,7 +206,8 @@ export default function TicketsAndQueries() {
                                         {ticket.status === 'open' && (
                                             <button
                                                 onClick={() => updateTicketStatus(ticket._id, 'resolved')}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors duration-150 w-full justify-center cursor-pointer"
+                                                disabled={isUpdating}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors duration-150 w-full justify-center cursor-pointer disabled:opacity-50"
                                                 aria-label="Mark as resolved"
                                             >
                                                 <CheckCircle className="w-3.5 h-3.5" />
@@ -229,7 +240,7 @@ export default function TicketsAndQueries() {
 
                                     <div className="flex items-center gap-2 text-xs text-slate-600">
                                         <Mail className="w-3.5 h-3.5 text-slate-400" />
-                                        <span className="truncate">{ticket.user}</span>
+                                        <span className="truncate">{ticket.email}</span>
                                     </div>
 
                                     <div className="text-sm text-slate-600 line-clamp-2">
@@ -247,13 +258,14 @@ export default function TicketsAndQueries() {
                                     <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-100">
                                         <div className="flex items-center gap-1 text-xs text-slate-500">
                                             <Calendar className="w-3.5 h-3.5" />
-                                            {formatDate(ticket.createdDate)}
+                                            {formatDate(ticket.createdAt)}
                                         </div>
 
                                         {ticket.status === 'open' && (
                                             <button
                                                 onClick={() => updateTicketStatus(ticket._id, 'resolved')}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors duration-150"
+                                                disabled={isUpdating}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors duration-150 disabled:opacity-50"
                                             >
                                                 <CheckCircle className="w-3.5 h-3.5" />
                                                 Resolve
@@ -288,7 +300,7 @@ export default function TicketsAndQueries() {
                         onClick={closeModal}
                     >
 
-                        <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+                        <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
                             {/* Modal Header */}
                             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
                                 <div>
@@ -365,10 +377,11 @@ export default function TicketsAndQueries() {
                                 {selectedTicket.status === 'open' && (
                                     <button
                                         onClick={() => {
-                                            updateTicketStatus(selectedTicket.id, 'resolved');
+                                            updateTicketStatus(selectedTicket._id, 'resolved');
                                             closeModal();
                                         }}
-                                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors duration-150"
+                                        disabled={isUpdating}
+                                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors duration-150 disabled:opacity-50"
                                     >
                                         <CheckCircle className="w-4 h-4" />
                                         Mark as Resolved
@@ -381,4 +394,4 @@ export default function TicketsAndQueries() {
             </div>
         </div>
     );
-}
+}
