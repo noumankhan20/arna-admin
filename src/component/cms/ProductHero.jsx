@@ -192,10 +192,10 @@ export default function ProductsHeroSection() {
             </div>
 
             {/* Responsive Dual Banner Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 
                 {/* 1. Desktop Banner Section (16:9 Landscape) */}
-                <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-sm space-y-5">
+                <div className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-sm space-y-5">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
                             <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
@@ -261,8 +261,8 @@ export default function ProductsHeroSection() {
                     )}
                 </div>
 
-                {/* 2. Mobile Banner Section (9:16 Portrait Phone Mockup) */}
-                <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-sm space-y-5">
+                {/* 2. Mobile Banner Section (4:3 Header Banner) */}
+                <div className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-sm space-y-5">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
                             <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
@@ -270,7 +270,7 @@ export default function ProductsHeroSection() {
                             </div>
                             <div>
                                 <h3 className="font-bold text-gray-900 text-base">Mobile Banner</h3>
-                                <p className="text-xs text-gray-400">Portrait View (9:16)</p>
+                                <p className="text-xs text-gray-400">Mobile Header (4:3 ratio)</p>
                             </div>
                         </div>
 
@@ -279,8 +279,8 @@ export default function ProductsHeroSection() {
                         </span>
                     </div>
 
-                    {/* Mobile Phone Mockup Frame */}
-                    <div className="flex justify-center">
+                    {/* Mobile Banner Preview Box (4:3 ratio) */}
+                    <div className="relative group rounded-2xl overflow-hidden border-2 border-dashed border-amber-200 bg-amber-50/20 aspect-[4/3] flex items-center justify-center">
                         <input
                             id="mobile-image-upload"
                             type="file"
@@ -290,10 +290,7 @@ export default function ProductsHeroSection() {
                         />
 
                         {mobilePreviewUrl ? (
-                            <div className="group relative w-full max-w-[240px] aspect-[9/16] rounded-[2.5rem] border-8 border-gray-900 shadow-xl overflow-hidden bg-gray-950">
-                                {/* Speaker notch */}
-                                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-16 h-3 bg-gray-900 rounded-full z-20 pointer-events-none" />
-
+                            <>
                                 <img
                                     src={mobilePreviewUrl}
                                     alt="Mobile Banner Preview"
@@ -301,41 +298,48 @@ export default function ProductsHeroSection() {
                                 />
 
                                 {/* Overlay Buttons on Hover */}
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2.5 p-4 backdrop-blur-xs z-30">
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2.5 p-4 backdrop-blur-xs">
                                     <label
                                         htmlFor="mobile-image-upload"
-                                        className="w-full text-center bg-white text-gray-900 py-2 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-emerald-50 transition-all cursor-pointer shadow-md"
+                                        className="bg-white text-gray-900 px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-emerald-50 transition-all cursor-pointer shadow-lg"
                                     >
-                                        Replace
+                                        Replace Mobile Banner
                                     </label>
                                     <button
                                         onClick={handleClearMobile}
                                         type="button"
-                                        className="w-full bg-red-500 text-white py-2 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-red-600 transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5"
+                                        className="bg-red-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-red-600 transition-all cursor-pointer shadow-lg flex items-center justify-center gap-1.5"
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
                                         <span>Clear</span>
                                     </button>
                                 </div>
-                            </div>
+                            </>
                         ) : (
                             <label
                                 htmlFor="mobile-image-upload"
-                                className="flex flex-col items-center justify-center w-full max-w-[240px] aspect-[9/16] border-2 border-dashed border-amber-200 bg-amber-50/20 hover:bg-amber-50/50 rounded-[2.5rem] cursor-pointer p-6 text-center transition-all group"
+                                className="flex flex-col items-center justify-center w-full h-full cursor-pointer p-6 text-center hover:bg-amber-50/50 transition-colors"
                             >
                                 <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                                     <Upload className="w-6 h-6" />
                                 </div>
-                                <span className="text-xs font-bold text-amber-800">Upload Mobile Banner</span>
-                                <span className="text-[11px] text-gray-500 mt-2 leading-relaxed">
-                                    Recommended: 750×1334px or 1080×1920px (Max 5MB)
+                                <span className="text-sm font-bold text-gray-700">Upload Mobile Banner</span>
+                                <span className="text-xs text-gray-400 mt-1">
+                                    Recommended: 800×600px (4:3 ratio, Max 5MB)
                                 </span>
                             </label>
                         )}
                     </div>
 
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>Formats: JPG, PNG, WEBP (Max 5MB)</span>
+                        {selectedMobileFile && (
+                            <span className="text-amber-600 font-medium">New image selected: {selectedMobileFile.name}</span>
+                        )}
+                    </div>
+
                     <div className="bg-amber-50/60 rounded-2xl p-3.5 border border-amber-100/80 text-[11px] text-amber-800 leading-relaxed">
-                        <strong>Tip:</strong> If no mobile banner is uploaded, the desktop banner will automatically adapt on mobile devices.
+                        <strong>Dimension Guide:</strong> The products page mobile hero header renders at ~4:3 ratio (approx 310px height on mobile screens). Uploading an <strong>800×600px</strong> (or 4:3) image prevents subjects or text from being cropped.
                     </div>
 
                     {mobileError && (
