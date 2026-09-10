@@ -1,4 +1,7 @@
+'use client';
+
 import { useState, useMemo } from 'react';
+
 import { toast } from 'react-toastify';
 import {
   useGetAllPromosQuery,

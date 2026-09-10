@@ -80,8 +80,8 @@ export const cmsApi = apiSlice.injectEndpoints({
 
     getProductsHero: builder.query({
       query: () => "/producthero/products-hero",
+      providesTags: ["ProductsHero"],
     }),
-    
 
     updateProductsHero: builder.mutation({
       query: (formData) => ({
@@ -89,9 +89,11 @@ export const cmsApi = apiSlice.injectEndpoints({
         method: "PUT",
         body: formData,
       }),
+      invalidatesTags: ["ProductsHero"],
     }),
   }),
 });
+
 
 export const {
   useGetAboutUsQuery,

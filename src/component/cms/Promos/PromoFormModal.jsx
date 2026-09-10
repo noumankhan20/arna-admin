@@ -1,4 +1,7 @@
+'use client';
+
 import { useState, useEffect } from 'react';
+
 import { toast } from 'react-toastify';
 
 export default function PromoFormModal({ isOpen, onClose, onSubmit, editPromo, isLoading }) {
@@ -241,7 +244,7 @@ export default function PromoFormModal({ isOpen, onClose, onSubmit, editPromo, i
                                         onChange={handleChange}
                                         required
                                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
-                                        placeholder="e.g., Summer Sale 2024"
+                                        placeholder="e.g., Summer Sale "
                                     />
                                 </div>
 

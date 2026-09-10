@@ -1,4 +1,7 @@
+'use client';
+
 import { useState, useEffect } from 'react';
+
 import {
   Home, Info, Star, FileText, Package,
   Menu, X, CheckCircle2,

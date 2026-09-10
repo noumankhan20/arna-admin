@@ -1,6 +1,9 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { toast } from 'react-toastify';
+
 import { useGetOurStoryQuery, useUpdateOurStoryMutation } from '../redux/slice/cmsApiSlice';
 
 export default function OurStorySection() {
