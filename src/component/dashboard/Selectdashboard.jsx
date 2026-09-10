@@ -20,10 +20,14 @@ export default function SelectPortal() {
     try {
       await logoutAdmin().unwrap();
       dispatch(apiSlice.util.resetApiState());
+      document.cookie = "adminToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      localStorage.removeItem("adminToken");
       toast.success("Logged out successfully");
       router.refresh();
-        window.location.replace("/login")
+      window.location.replace("/login");
     } catch (error) {
+      document.cookie = "adminToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      localStorage.removeItem("adminToken");
       toast.error("Logout failed");
     }
   };

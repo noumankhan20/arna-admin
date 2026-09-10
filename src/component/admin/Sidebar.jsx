@@ -24,9 +24,13 @@ const Sidebar = () => {
     const handleLogout = async () => {
         try {
             await logoutAdmin().unwrap();
+            document.cookie = "adminToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            localStorage.removeItem("adminToken");
             toast.success("Logged out successfully");
             router.replace("/");
         } catch (error) {
+            document.cookie = "adminToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            localStorage.removeItem("adminToken");
             toast.error("Logout failed");
         }
     };

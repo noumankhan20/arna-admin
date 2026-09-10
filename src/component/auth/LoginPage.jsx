@@ -29,7 +29,11 @@ export default function AdminLogin() {
     e.preventDefault();
 
     try {
-      await loginAdmin(formData).unwrap();
+      const res = await loginAdmin(formData).unwrap();
+      if (res?.token) {
+        document.cookie = `adminToken=${res.token}; path=/; max-age=604800; SameSite=Lax${window.location.protocol === 'https:' ? '; Secure' : ''}`;
+        localStorage.setItem("adminToken", res.token);
+      }
       router.push("/select-dashboard");
     } catch (err) {
       toast.error(err?.data?.message || "Login failed");
