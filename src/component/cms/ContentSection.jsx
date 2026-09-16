@@ -46,6 +46,12 @@ export default function ContentSection({
 
   const [deleteSlide] = useDeleteHomeHeroMutation();
 
+  // Helper to check video format from extension
+  const isVideoPath = (url) => {
+    if (!url) return false;
+    return /\.(mp4|webm|mov|ogg)($|\?)/i.test(url);
+  };
+
   // Local state for the current editing slide
   const [editForm, setEditForm] = useState({
     title: '',
@@ -54,7 +60,8 @@ export default function ContentSection({
     imageUrl: '',
     mobileImagePreview: '',
     mobileImageUrl: '',
-    mediaType: 'image'
+    mediaType: 'image',
+    mobileMediaType: 'image'
   });
 
   useEffect(() => {
@@ -68,12 +75,15 @@ export default function ContentSection({
       } else {
         // Single section (About)
         const d = apiData.data;
+        const desktopIsVid = d.mediaType === 'video' || isVideoPath(d.imageUrl);
+        const mobileIsVid = d.mobileMediaType === 'video' || isVideoPath(d.mobileImageUrl);
         setEditForm({
           title: d.title || '',
           description: d.description || '',
           imageUrl: d.imageUrl || '',
           mobileImageUrl: d.mobileImageUrl || '',
-          mediaType: d.mediaType || 'image',
+          mediaType: desktopIsVid ? 'video' : 'image',
+          mobileMediaType: mobileIsVid ? 'video' : 'image',
           imagePreview: d.imageUrl
             ? (d.imageUrl.startsWith('http') ? d.imageUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL}${d.imageUrl}`)
             : '',
@@ -90,12 +100,15 @@ export default function ContentSection({
     if (isHomeHero && apiData?.data && selectedSlideId) {
       const slide = apiData.data.find(s => s.section === selectedSlideId);
       if (slide) {
+        const desktopIsVid = slide.mediaType === 'video' || isVideoPath(slide.imageUrl);
+        const mobileIsVid = slide.mobileMediaType === 'video' || isVideoPath(slide.mobileImageUrl);
         setEditForm({
           title: slide.title || '',
           description: slide.description || '',
           imageUrl: slide.imageUrl || '',
           mobileImageUrl: slide.mobileImageUrl || '',
-          mediaType: slide.mediaType || 'image',
+          mediaType: desktopIsVid ? 'video' : 'image',
+          mobileMediaType: mobileIsVid ? 'video' : 'image',
           imagePreview: slide.imageUrl
             ? (slide.imageUrl.startsWith('http') ? slide.imageUrl : `${process.env.NEXT_PUBLIC_BACKEND_URL}${slide.imageUrl}`)
             : '',
@@ -150,6 +163,7 @@ export default function ContentSection({
       setEditForm(prev => ({
         ...prev,
         mobileImagePreview: previewUrl,
+        mobileMediaType: isVideo ? 'video' : 'image'
       }));
     } else {
       setPendingFile(file);
@@ -184,12 +198,13 @@ export default function ContentSection({
 
       if (pendingFile) {
         formData.append("image", pendingFile);
-        formData.append("mediaType", editForm.mediaType);
       }
+      formData.append("mediaType", editForm.mediaType || 'image');
 
       if (pendingMobileFile) {
         formData.append("mobileImage", pendingMobileFile);
       }
+      formData.append("mobileMediaType", editForm.mobileMediaType || 'image');
 
       const res = await saveData(formData).unwrap();
       showSuccessToast(isAddingNew ? 'Slide created!' : 'Saved successfully!');
@@ -236,7 +251,8 @@ export default function ContentSection({
       imageUrl: '',
       mobileImagePreview: '',
       mobileImageUrl: '',
-      mediaType: 'image'
+      mediaType: 'image',
+      mobileMediaType: 'image'
     });
   };
 
@@ -275,9 +291,9 @@ export default function ContentSection({
                       : "bg-gray-50 text-gray-500 hover:bg-gray-100 border border-gray-100"
                       }`}
                   >
-                    {slide.mediaType === 'video' ? (
-                      <div className="w-5 h-5 rounded-md bg-gray-200 flex items-center justify-center">
-                        <Upload className="w-3 h-3 text-gray-500" />
+                    {slide.mediaType === 'video' || isVideoPath(slide.imageUrl) ? (
+                      <div className="w-5 h-5 rounded-md bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold" title="Video Banner">
+                        ▶
                       </div>
                     ) : (
                       <img
@@ -352,6 +368,11 @@ export default function ContentSection({
                     <Layout className="w-4 h-4 text-emerald-500" />
                     Desktop Visual (Landscape)
                   </label>
+                  {editForm.imagePreview && (
+                    <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      {editForm.mediaType === 'video' || isVideoPath(editForm.imagePreview) ? '🎬 Video' : '🖼️ Image'}
+                    </span>
+                  )}
                 </div>
 
                 <div className="relative">
@@ -365,7 +386,7 @@ export default function ContentSection({
 
                   {editForm.imagePreview ? (
                     <div className="group relative overflow-hidden rounded-[2rem] border-4 border-gray-50 shadow-inner h-64">
-                      {editForm.mediaType === 'video' ? (
+                      {editForm.mediaType === 'video' || isVideoPath(editForm.imagePreview) ? (
                         <video
                           src={editForm.imagePreview}
                           className="w-full h-full object-cover"
@@ -406,25 +427,41 @@ export default function ContentSection({
                     <Layout className="w-4 h-4 text-amber-500" />
                     Mobile Visual (Portrait)
                   </label>
-                  {isHomeHero && <span className="text-[9px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Recommended</span>}
+                  <div className="flex items-center gap-2">
+                    {editForm.mobileImagePreview && (
+                      <span className="text-[10px] bg-amber-50 text-amber-700 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        {editForm.mobileMediaType === 'video' || isVideoPath(editForm.mobileImagePreview) ? '🎬 Video' : '🖼️ Image'}
+                      </span>
+                    )}
+                    {isHomeHero && <span className="text-[9px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Recommended</span>}
+                  </div>
                 </div>
 
                 <div className="relative flex justify-center">
                   <input
                     type="file"
                     id="mobile-image-upload"
-                    accept="image/*"
+                    accept="image/*,video/*"
                     onChange={(e) => handleFileSelect(e, 'mobile')}
                     className="hidden"
                   />
 
                   {editForm.mobileImagePreview ? (
                     <div className="group relative isolate overflow-hidden rounded-[2.5rem] border-8 border-gray-900 shadow-2xl w-full max-w-[280px] aspect-[9/16]">
-                      <img
-                        src={editForm.mobileImagePreview}
-                        alt="Mobile Preview"
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 rounded-[inherit]"
-                      />
+                      {editForm.mobileMediaType === 'video' || isVideoPath(editForm.mobileImagePreview) ? (
+                        <video
+                          src={editForm.mobileImagePreview}
+                          className="w-full h-full object-cover rounded-[inherit]"
+                          controls
+                          playsInline
+                        />
+                      ) : (
+                        <img
+                          src={editForm.mobileImagePreview}
+                          alt="Mobile Preview"
+                          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 rounded-[inherit]"
+                        />
+                      )}
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm flex items-center justify-center gap-4 rounded-[inherit]">
                         <button
                           onClick={() => document.getElementById("mobile-image-upload").click()}
@@ -435,7 +472,7 @@ export default function ContentSection({
                         <button
                           onClick={() => {
                             setPendingMobileFile(null);
-                            setEditForm(p => ({ ...p, mobileImagePreview: '', mobileImageUrl: '' }));
+                            setEditForm(p => ({ ...p, mobileImagePreview: '', mobileImageUrl: '', mobileMediaType: 'image' }));
                           }}
                           className="bg-red-500 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-red-600 transition-all"
                         >
