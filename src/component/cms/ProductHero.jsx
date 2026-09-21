@@ -194,7 +194,7 @@ export default function ProductsHeroSection() {
             {/* Responsive Dual Banner Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 
-                {/* 1. Desktop Banner Section (16:9 Landscape) */}
+                {/* 1. Desktop Banner Section (16:5 Landscape) */}
                 <div className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-sm space-y-5">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
@@ -203,7 +203,7 @@ export default function ProductsHeroSection() {
                             </div>
                             <div>
                                 <h3 className="font-bold text-gray-900 text-base">Desktop Banner</h3>
-                                <p className="text-xs text-gray-400">Landscape (16:9 or wide ratio)</p>
+                                <p className="text-xs text-gray-400">Landscape (16:5 or wide ratio)</p>
                             </div>
                         </div>
 
@@ -350,4 +350,4 @@ export default function ProductsHeroSection() {
             </div>
         </div>
     );
-}
+}
